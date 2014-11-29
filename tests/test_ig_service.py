@@ -74,7 +74,7 @@ def test_ig_service():
     print("fetch_watchlist_markets")
     response = ig_service.fetch_watchlist_markets(watchlist_id)
     print(response)
-    epic = response['epic'].iloc[0]
+    epic = response['epic'].iloc[0] # epic = 'CS.D.EURUSD.MINI.IP'
 
     print("fetch_market_by_epic")
     response = ig_service.fetch_market_by_epic(epic)
@@ -86,3 +86,9 @@ def test_ig_service():
     response = ig_service.search_markets(epic)
     print(response)
 
+    resolution = 'HOUR'
+    num_points = 100
+    response = ig_service.fetch_historical_prices_by_epic_and_num_points(epic, resolution, num_points)
+    print(response['prices']['price']['ask'])
+    print(response['prices']['volume'])
+    assert(isinstance(response['prices']['price'], pd.Panel))

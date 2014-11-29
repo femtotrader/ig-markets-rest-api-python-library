@@ -308,12 +308,35 @@ class IGService:
             data = pd.DataFrame(data['markets'])
         return(data)
 
+    def format_prices(self, prices):
+        """Format prices data as a dict with a Panel (ask, bid, lastTraded as major index)
+        and a timeserie for lastTradedVolume"""
+        df = pd.DataFrame(prices)
+        df = df.set_index('snapshotTime')
+        df_ask = df[[u'openPrice', u'highPrice', u'lowPrice', u'closePrice']].applymap(lambda x: x['ask'])
+        df_bid = df[[u'openPrice', u'highPrice', u'lowPrice', u'closePrice']].applymap(lambda x: x['bid'])
+        df_lastTraded = df[[u'openPrice', u'highPrice', u'lowPrice', u'closePrice']].applymap(lambda x: x['lastTraded'])
+        ts_lastTradedVolume = df['lastTradedVolume']
+        panel = pd.Panel.from_dict({'ask': df_ask, 'bid': df_bid, 'lastTraded': df_lastTraded})
+        prices = {}
+        prices['price'] = panel
+        prices['volume'] = ts_lastTradedVolume
+        return(prices)
+
+    def fetch_historical_prices_by_epic_and_num_points(self, epic, resolution, num_points):
+        """Returns a list of historical prices for the given epic, resolution, number of points"""
+        response = requests.get(self.BASE_URL + "/prices/{epic}/{resolution}/{numpoints}".format(epic=epic, resolution=resolution, numpoints=num_points), headers=self.LOGGED_IN_HEADERS)
+        data = self.parse_response(response.text)
+        if self.return_dataframe:
+            data['prices'] = self.format_prices(data['prices'])
+        return(data)
+
     def fetch_historical_prices_by_epic_and_date_range(self, epic, resolution, start_date, end_date):
         """Returns a list of historical prices for the given epic, resolution, multiplier and date range"""
         response = requests.get(self.BASE_URL + "/prices/{epic}/{resolution}/?startdate={start_date}&enddate={end_date}".format(epic=epic, resolution=resolution, start_date=start_date, end_date=end_date), headers=self.LOGGED_IN_HEADERS)
         data = self.parse_response(response.text)
         if self.return_dataframe:
-            data['prices'] = pd.DataFrame(data['prices'])
+            data['prices'] = self.format_prices(data['prices'])
         return(data)
 
     ############ END ############
