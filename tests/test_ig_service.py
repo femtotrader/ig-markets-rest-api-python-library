@@ -90,6 +90,7 @@ def test_ig_service():
     resolution = 'HOUR'
     num_points = 100
     response = ig_service.fetch_historical_prices_by_epic_and_num_points(epic, resolution, num_points)
+    print(response['prices']['price'])
     print(response['prices']['price']['ask'])
     print(response['prices']['volume'])
     assert(isinstance(response['prices']['price'], pd.Panel))

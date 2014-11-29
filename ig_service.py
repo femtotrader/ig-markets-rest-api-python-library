@@ -318,11 +318,14 @@ class IGService:
         """
         df = pd.DataFrame(prices)
         df = df.set_index('snapshotTime')
+        df.index.name = 'DateTime'
         df_ask = df[[u'openPrice', u'highPrice', u'lowPrice', u'closePrice']].applymap(lambda x: x['ask'])
         df_bid = df[[u'openPrice', u'highPrice', u'lowPrice', u'closePrice']].applymap(lambda x: x['bid'])
         df_lastTraded = df[[u'openPrice', u'highPrice', u'lowPrice', u'closePrice']].applymap(lambda x: x['lastTraded'])
         ts_lastTradedVolume = df['lastTradedVolume']
+        #ts_lastTradedVolume.name = 'Volume'
         panel = pd.Panel.from_dict({'ask': df_ask, 'bid': df_bid, 'lastTraded': df_lastTraded})
+        panel = panel.rename(minor={'openPrice': 'Open', 'highPrice': 'High', 'lowPrice': 'Low', 'closePrice': 'Close'})
         prices = {}
         prices['price'] = panel
         prices['volume'] = ts_lastTradedVolume
