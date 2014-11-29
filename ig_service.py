@@ -309,8 +309,13 @@ class IGService:
         return(data)
 
     def format_prices(self, prices):
-        """Format prices data as a dict with a Panel (ask, bid, lastTraded as major index)
-        and a timeserie for lastTradedVolume"""
+        """Format prices data as a dict with 
+         - 'price' : a Pandas Panel
+                ask, bid, lastTraded as Items axis
+                date as Major_axis axis
+                openPrice highPrice lowPrice closePrice as Minor_axis axis
+         - 'volume' : a timeserie for lastTradedVolume
+        """
         df = pd.DataFrame(prices)
         df = df.set_index('snapshotTime')
         df_ask = df[[u'openPrice', u'highPrice', u'lowPrice', u'closePrice']].applymap(lambda x: x['ask'])

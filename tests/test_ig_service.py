@@ -86,6 +86,7 @@ def test_ig_service():
     response = ig_service.search_markets(epic)
     print(response)
 
+    #epic = 'CS.D.EURUSD.MINI.IP'
     resolution = 'HOUR'
     num_points = 100
     response = ig_service.fetch_historical_prices_by_epic_and_num_points(epic, resolution, num_points)
