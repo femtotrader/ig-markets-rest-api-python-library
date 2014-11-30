@@ -15,6 +15,11 @@ print("open_positions:\n%s" % open_positions)
 
 print("")
 
+working_orders = ig_service.fetch_working_orders()
+print("working_orders:\n%s" % working_orders)
+
+print("")
+
 epic = 'CS.D.EURUSD.MINI.IP'
 resolution = 'DAY'
 num_points = 10

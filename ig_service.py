@@ -193,6 +193,16 @@ class IGService:
         data = self.parse_response(response.text)
         if self.return_dataframe:
             data = pd.DataFrame(data['workingOrders'])
+            # ToDo
+            """
+                                          marketData  \
+0  {u'instrumentName': u'FX au comptant (mini) EU...
+
+                                    workingOrderData
+0  {u'trailingStopDistance': None, u'direction': ...
+
+            
+            """
         return(data)
 
     def create_working_order(self, currency_code, direction, epic, expiry, good_till_date, 
