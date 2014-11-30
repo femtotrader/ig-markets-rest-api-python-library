@@ -11,8 +11,16 @@ import requests
 import json
 import logging
 import traceback
-import pandas as pd
-#from bunch import bunchify
+
+try:
+    import pandas as pd
+except:
+    logging.warning("Can't import pandas - return_dataframe should be set to False")
+
+try:
+    from bunch import bunchify
+except:
+    logging.warning("Can't import bunchify - return_bunch should be set to False")
 
 class IGService:
 
@@ -52,6 +60,7 @@ class IGService:
         self.parse_response = self.parse_response_with_exception
 
         self.return_dataframe = True
+        self.return_bunch = True
 
         #self.create_session()
 
@@ -73,7 +82,6 @@ class IGService:
         if 'errorCode' in response:
             raise(Exception(response['errorCode']))
         return(response)
-        #return(bunchify(response))
 
     ############ END ############
 
@@ -384,6 +392,8 @@ class IGService:
         """Returns the details of the given market"""
         response = requests.get(self.BASE_URL + '/markets/%s' % epic, headers=self.LOGGED_IN_HEADERS)
         data = self.parse_response(response.text)
+        if self.return_bunch:
+            data = bunchify(data)
         return(data)
 
     def search_markets(self, search_term):
