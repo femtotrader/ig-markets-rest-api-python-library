@@ -11,10 +11,13 @@ ig_service.create_session()
 #print(account_info)
 
 open_positions = ig_service.fetch_open_positions()
-print(open_positions)
+print("open_positions:\n%s" % open_positions)
+
+print("")
 
 epic = 'CS.D.EURUSD.MINI.IP'
 resolution = 'DAY'
-num_points = 100
+num_points = 10
 response = ig_service.fetch_historical_prices_by_epic_and_num_points(epic, resolution, num_points)
-print(response['prices']['price']['ask'])
+df_ask = response['prices']['price']['ask']
+print("ask prices:\n%s" % df_ask)
