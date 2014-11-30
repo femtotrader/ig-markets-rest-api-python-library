@@ -7,6 +7,9 @@ from ig_service_config import *
 ig_service = IGService(username, password, api_key, acc_type)
 ig_service.create_session()
 
+accounts = ig_service.fetch_accounts()
+print("accounts:\n%s" % accounts)
+
 #account_info = ig_service.switch_account(acc_number, False)
 #print(account_info)
 

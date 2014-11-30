@@ -12,6 +12,7 @@ import json
 import logging
 import traceback
 import pandas as pd
+from bunch import bunchify
 
 class IGService:
 
@@ -72,8 +73,40 @@ class IGService:
         if 'errorCode' in response:
             raise(Exception(response['errorCode']))
         return(response)
+        #return(bunchify(response))
 
     ############ END ############
+
+
+
+    ########## DATAFRAME TOOLS ##########
+
+    def colname_unique(self, d_cols):
+        """Returns a set of column names (unique)"""
+        s = set()
+        for col, lst in d_cols.items():
+             for colname in lst:
+                 s.add(colname)
+        return(s)
+
+    def expand_columns(self, data, d_cols, flag_col_prefix=False, col_overlap_allowed=[]):
+        """Expand columns"""
+        for (col_lev1, lst_col) in d_cols.items():
+            ser = data[col_lev1]
+            del data[col_lev1]
+            for col in lst_col:
+                if col not in data.columns or col in col_overlap_allowed:
+                    if flag_col_prefix:
+                        colname = col_lev1 + "_" + col
+                    else:
+                        colname = col
+                    data[colname] = ser.map(lambda x: x[col])
+                else:
+                    raise(NotImplementedError("col overlap: %r" % col))
+        return(data)
+
+    ############ END ############
+
 
 
     ########## ACCOUNT ##########
@@ -84,6 +117,16 @@ class IGService:
         data = self.parse_response(response.text)
         if self.return_dataframe:
             data = pd.DataFrame(data['accounts'])
+            d_cols = {
+                'balance': [u'available', u'balance', u'deposit', u'profitLoss']
+            }
+            data = self.expand_columns(data, d_cols, False)
+
+            if len(data)==0:
+                columns = ['accountAlias', 'accountId', 'accountName', 'accountType', 'balance', 'available', 'balance', 'deposit', 'profitLoss', 'canTransferFrom', 'canTransferTo', 'currency', 'preferred', 'status']
+                data = pd.DataFrame(columns=columns)
+                return(data)
+
         return(data)
 
     def fetch_account_activity_by_period(self, milliseconds):
@@ -92,6 +135,12 @@ class IGService:
         data = self.parse_response(response.text)
         if self.return_dataframe:
             data = pd.DataFrame(data['activities'])
+
+            if len(data)==0:            
+                columns = ['actionStatus', 'activity', 'activityHistoryId', 'channel', 'currency', 'date', 'dealId', 'epic', 'level', 'limit', 'marketName', 'period', 'result', 'size', 'stop', 'stopType', 'time']
+                data = pd.DataFrame(columns=columns)
+                return(data)
+
         return(data)
 
     def fetch_transaction_history_by_type_and_period(self, milliseconds, trans_type):
@@ -100,6 +149,12 @@ class IGService:
         data = self.parse_response(response.text)
         if self.return_dataframe:
             data = pd.DataFrame(data['transactions'])
+
+            if len(data)==0:
+                columns = ['cashTransaction', 'closeLevel', 'currency', 'date', 'instrumentName', 'openLevel', 'period', 'profitAndLoss', 'reference', 'size', 'transactionType']
+                data = pd.DataFrame(columns=columns)
+                return(data)
+
         return(data)
 
     ############ END ############
@@ -119,7 +174,20 @@ class IGService:
         response = requests.get(self.BASE_URL  + '/positions', headers=self.LOGGED_IN_HEADERS)
         data = self.parse_response(response.text)
         if self.return_dataframe:
-            data = pd.DataFrame(data['positions'])
+            lst = data['positions']
+            data = pd.DataFrame(lst)
+
+            d_cols = {
+                'market': ['bid', 'delayTime', 'epic', 'expiry', 'high', 'instrumentName', 'instrumentType', 'lotSize', 'low', 'marketStatus', 'netChange', 'offer', 'percentageChange', 'scalingFactor', 'streamingPricesAvailable', 'updateTime'],
+                'position': ['contractSize', 'controlledRisk', 'createdDate', 'currency', 'dealId', 'dealSize', 'direction', 'limitLevel', 'openLevel', 'stopLevel', 'trailingStep', 'trailingStopDistance']
+            }
+
+            if len(data)==0:
+                data = pd.DataFrame(columns=self.colname_unique(d_cols))
+                return(data)
+            
+            #data = self.expand_columns(data, d_cols)
+        
         return(data)
 
     def close_open_position(self, deal_id, direction, epic, expiry, level, order_type, quote_id, size):
@@ -192,35 +260,24 @@ class IGService:
         response = requests.get(self.BASE_URL  + '/workingorders', headers=self.LOGGED_IN_HEADERS)
         data = self.parse_response(response.text)
         if self.return_dataframe:
-            # ToDo
-            """
-            {u'workingOrders': [{u'marketData': {u'instrumentName': u'FX au comptant (mini) EUR/USD', u'exchangeId': u'FX_C_MINI_ST', u'streamingPricesAvailable': True, u'scalingFactor': 10000, u'offer': 1.24505, u'bid': 1.24463, u'updateTime': u'1970/01/01 22:33:53:000', u'expiry': u'-', u'high': 1.24529, u'marketStatus': u'EDITS_ONLY', u'delayTime': 0, u'lotSize': 1.0, u'percentageChange': -0.01, u'epic': u'CS.D.EURUSD.MINI.IP', u'netChange': -0.00017, u'instrumentType': u'CURRENCIES', u'low': 1.24463}, u'workingOrderData': {u'trailingStopDistance': None, u'direction': u'BUY', u'contingentLimit': 1.0, u'level': 2.0, u'requestType': u'STOP_ORDER', u'currencyCode': u'USD', u'trailingTriggerIncrement': None, u'dealId': u'DIAAAAAK7R9LKA6', u'contingentStop': 5.0, u'goodTill': u'GTC', u'controlledRisk': False, u'trailingStopIncrement': None, u'createdDate': u'2014/11/30 10:22:53:000', u'dma': False, u'epic': u'CS.D.EURUSD.MINI.IP', u'trailingTriggerDistance': None, u'size': 1}}]}
+            lst = data['workingOrders']
+            data = pd.DataFrame(lst)
 
-                                          marketData  \
-0  {u'instrumentName': u'FX au comptant (mini) EU...
+            d_cols = {
+                'marketData': [u'instrumentName', u'exchangeId', u'streamingPricesAvailable', u'offer', u'low', u'bid', u'updateTime', u'expiry', u'high', u'marketStatus', u'delayTime', u'lotSize', u'percentageChange', u'epic', u'netChange', u'instrumentType', u'scalingFactor'],
+                'workingOrderData': [u'size', u'trailingStopDistance', u'direction', u'level', u'requestType', u'currencyCode', u'contingentLimit', u'trailingTriggerIncrement', u'dealId', u'contingentStop', u'goodTill', u'controlledRisk', u'trailingStopIncrement', u'createdDate', u'epic', u'trailingTriggerDistance', u'dma']
+            }
 
-                                    workingOrderData
-0  {u'trailingStopDistance': None, u'direction': ...
-            """
+            if len(data)==0:
+                data = pd.DataFrame(columns=self.colname_unique(d_cols))
+                return(data)
 
-            #data = pd.DataFrame(data['workingOrders'])
+            col_overlap_allowed = ['epic']
 
-            #d = {
-            #    'marketData': [u'instrumentName', u'exchangeId', u'streamingPricesAvailable', u'offer', u'low', u'bid', u'updateTime', u'expiry', u'high', u'marketStatus', u'delayTime', u'lotSize', u'percentageChange', u'epic', u'netChange', u'instrumentType', u'scalingFactor'],
-            #    'workingOrderData': [u'size', u'trailingStopDistance', u'direction', u'level', u'requestType', u'currencyCode', u'contingentLimit', u'trailingTriggerIncrement', u'dealId', u'contingentStop', u'goodTill', u'controlledRisk', u'trailingStopIncrement', u'createdDate', u'epic', u'trailingTriggerDistance', u'dma']
-            #}
+            data = self.expand_columns(data, d_cols, False, col_overlap_allowed)
 
-            #for (col_lev1, lst_col) in d.items():
-            #    for col in lst_col:
-            #        data[col_lev1 + "_" + col] = data[col_lev1].map(lambda x: x[col])
-            #    del data[col_lev1]
-
-            d = data['workingOrders']
-            data = pd.DataFrame(data['workingOrders'])
-            d = data.to_dict()
-            #l = data['workingOrders']
-            #d = {i: l[i] for i in range(len(l))}
-            data = pd.concat(list(map(pd.DataFrame, d.values())), keys=list(d.keys())).T
+            #d = data.to_dict()
+            #data = pd.concat(list(map(pd.DataFrame, d.values())), keys=list(d.keys())).T
 
         return(data)
 

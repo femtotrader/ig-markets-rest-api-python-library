@@ -9,15 +9,19 @@ nosetests -s -v
 from ig_service import IGService
 from ig_service_config import * # defines username, password, api_key, acc_type, acc_number
 import pandas as pd
+import pprint
 
 def test_ig_service():
+    pp = pprint.PrettyPrinter(indent=4)
+
     ig_service = IGService(username, password, api_key, acc_type)
     ig_service.create_session()
 
     print("fetch_accounts")
     response = ig_service.fetch_accounts()
     print(response)
-    assert(response['balance'][0]['available']>0)
+    #assert(response['balance'][0]['available']>0)
+    assert(response['balance'][0]>0)
 
     print("fetch_account_activity_by_period")
     response = ig_service.fetch_account_activity_by_period(10000)
@@ -78,8 +82,9 @@ def test_ig_service():
 
     print("fetch_market_by_epic")
     response = ig_service.fetch_market_by_epic(epic)
-    print(response)
-
+    #print(response)
+    pp.pprint(response)
+    assert(isinstance(response, dict))
 
     print("search_markets")
     search_term = 'UNDEF'
@@ -88,7 +93,7 @@ def test_ig_service():
 
     #epic = 'CS.D.EURUSD.MINI.IP'
     resolution = 'HOUR'
-    num_points = 100
+    num_points = 10
     response = ig_service.fetch_historical_prices_by_epic_and_num_points(epic, resolution, num_points)
     print(response['prices']['price'])
     print(response['prices']['price']['ask'])
