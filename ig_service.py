@@ -360,6 +360,8 @@ class IGService:
         """Returns the client sentiment for the given instrument's market"""
         response = requests.get(self.BASE_URL + '/clientsentiment/%s' % market_id, headers=self.LOGGED_IN_HEADERS)
         data = self.parse_response(response.text)
+        if self.return_bunch:
+            data = bunchify(data)
         return(data)
 
     def fetch_related_client_sentiment_by_instrument(self, market_id):
@@ -376,7 +378,15 @@ class IGService:
         data = self.parse_response(response.text)
         if self.return_dataframe:
             data['markets'] = pd.DataFrame(data['markets'])
+            if len(data['markets'])==0:
+                columns = ['bid', 'delayTime', 'epic', 'expiry', 'high', 'instrumentName', 'instrumentType', 'lotSize', 'low', 'marketStatus', 'netChange', 'offer', 'otcTradeable', 'percentageChange', 'scalingFactor', 'streamingPricesAvailable', 'updateTime']
+                data['markets'] = pd.DataFrame(columns=columns)
             data['nodes'] = pd.DataFrame(data['nodes'])
+            if len(data['nodes'])==0:
+                columns = ['id', 'name']
+                data['nodes'] = pd.DataFrame(columns=columns)
+        #if self.return_bunch:
+        #    data = bunchify(data) # ToFix: ValueError: The truth value of a DataFrame is ambiguous. Use a.empty, a.bool(), a.item(), a.any() or a.all().
         return(data)
 
     def fetch_sub_nodes_by_node(self, node):
