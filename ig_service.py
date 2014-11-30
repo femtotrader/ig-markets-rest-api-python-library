@@ -192,17 +192,36 @@ class IGService:
         response = requests.get(self.BASE_URL  + '/workingorders', headers=self.LOGGED_IN_HEADERS)
         data = self.parse_response(response.text)
         if self.return_dataframe:
-            data = pd.DataFrame(data['workingOrders'])
             # ToDo
             """
+            {u'workingOrders': [{u'marketData': {u'instrumentName': u'FX au comptant (mini) EUR/USD', u'exchangeId': u'FX_C_MINI_ST', u'streamingPricesAvailable': True, u'scalingFactor': 10000, u'offer': 1.24505, u'bid': 1.24463, u'updateTime': u'1970/01/01 22:33:53:000', u'expiry': u'-', u'high': 1.24529, u'marketStatus': u'EDITS_ONLY', u'delayTime': 0, u'lotSize': 1.0, u'percentageChange': -0.01, u'epic': u'CS.D.EURUSD.MINI.IP', u'netChange': -0.00017, u'instrumentType': u'CURRENCIES', u'low': 1.24463}, u'workingOrderData': {u'trailingStopDistance': None, u'direction': u'BUY', u'contingentLimit': 1.0, u'level': 2.0, u'requestType': u'STOP_ORDER', u'currencyCode': u'USD', u'trailingTriggerIncrement': None, u'dealId': u'DIAAAAAK7R9LKA6', u'contingentStop': 5.0, u'goodTill': u'GTC', u'controlledRisk': False, u'trailingStopIncrement': None, u'createdDate': u'2014/11/30 10:22:53:000', u'dma': False, u'epic': u'CS.D.EURUSD.MINI.IP', u'trailingTriggerDistance': None, u'size': 1}}]}
+
                                           marketData  \
 0  {u'instrumentName': u'FX au comptant (mini) EU...
 
                                     workingOrderData
 0  {u'trailingStopDistance': None, u'direction': ...
-
-            
             """
+
+            #data = pd.DataFrame(data['workingOrders'])
+
+            #d = {
+            #    'marketData': [u'instrumentName', u'exchangeId', u'streamingPricesAvailable', u'offer', u'low', u'bid', u'updateTime', u'expiry', u'high', u'marketStatus', u'delayTime', u'lotSize', u'percentageChange', u'epic', u'netChange', u'instrumentType', u'scalingFactor'],
+            #    'workingOrderData': [u'size', u'trailingStopDistance', u'direction', u'level', u'requestType', u'currencyCode', u'contingentLimit', u'trailingTriggerIncrement', u'dealId', u'contingentStop', u'goodTill', u'controlledRisk', u'trailingStopIncrement', u'createdDate', u'epic', u'trailingTriggerDistance', u'dma']
+            #}
+
+            #for (col_lev1, lst_col) in d.items():
+            #    for col in lst_col:
+            #        data[col_lev1 + "_" + col] = data[col_lev1].map(lambda x: x[col])
+            #    del data[col_lev1]
+
+            d = data['workingOrders']
+            data = pd.DataFrame(data['workingOrders'])
+            d = data.to_dict()
+            #l = data['workingOrders']
+            #d = {i: l[i] for i in range(len(l))}
+            data = pd.concat(list(map(pd.DataFrame, d.values())), keys=list(d.keys())).T
+
         return(data)
 
     def create_working_order(self, currency_code, direction, epic, expiry, good_till_date, 
