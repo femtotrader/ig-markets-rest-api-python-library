@@ -5,6 +5,7 @@
 IG Markets REST API Library for Python
 http://labs.ig.com/rest-trading-api-reference
 By Lewis Barber - 2014 - http://uk.linkedin.com/in/lewisbarber/
+Modified by Femto Trader - 2014-2015
 """
 
 import requests
@@ -14,13 +15,19 @@ import traceback
 
 try:
     import pandas as pd
-except:
+except ImportError:
+    _HAS_PANDAS = False
     logging.warning("Can't import pandas - return_dataframe should be set to False")
+else:
+    _HAS_PANDAS = True
 
 try:
     from bunch import bunchify
-except:
+except ImportError:
+    _HAS_PANDAS = False
     logging.warning("Can't import bunchify - return_bunch should be set to False")
+else:
+    _HAS_PANDAS = False
 
 class IGService:
 
