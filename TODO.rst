@@ -1,7 +1,7 @@
- - config file (YAML or .py which could be overwritten by environment variable)
- - continuous integration using Travis-CI config file using environment variable (because of CI)
- - merge ig-markets-rest-api-python-library and ig-markets-stream-api-python-library
- - build a pip package, register, upload
+- config file (YAML or .py which could be overwritten by environment variable)
+- continuous integration using Travis-CI config file using environment variable (because of CI)
+- merge ig-markets-rest-api-python-library and ig-markets-stream-api-python-library
+- build a pip package, register, upload
 
 .. code:: python
 
