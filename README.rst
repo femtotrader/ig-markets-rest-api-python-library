@@ -1,5 +1,5 @@
-## IG Markets REST API - Python Library
----------------------------------------
+IG Markets REST API - Python Library
+------------------------------------
 
 A lightweight Python library that can be used to connect to the IG
 Markets REST API with a LIVE or DEMO account.
@@ -14,8 +14,8 @@ account with IG can be found at the link below:
 
 http://labs.ig.com/
 
-### How To Use The Library
---------------------------
+How To Use The Library
+----------------------
 
 Using this library to connect to the IG Markets API is extremely easy.
 All you need to do is import the IGService class, create an instance,
