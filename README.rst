@@ -58,8 +58,8 @@ instance of the IGService class.
 
 .. code:: python
 
-    from ig_service import IGService
-    from ig_service_config import *
+    from trading_ig import IGService
+    from trading_ig_config import *
 
     ig_service = IGService(username, password, api_key, acc_type)
     ig_service.create_session()
@@ -79,7 +79,7 @@ instance of the IGService class.
     df_ask = response['prices']['price']['ask']
     print("ask prices:\n%s" % df_ask)
 
-with ``ig_service_config.py``
+with ``trading_ig_config.py``
 
 .. code:: python
 
@@ -103,7 +103,7 @@ and we can get it using
 
 .. code:: python
 
-    from ig_service import ConfigEnvVar
+    from trading_ig import ConfigEnvVar
     config = ConfigEnvVar("IG_SERVICE")
     ig_service = IGService(config.username, config.password, config.api_key, config.acc_type)
 
