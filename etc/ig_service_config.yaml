@@ -1,5 +1,0 @@
-username: !!null
-password: !!null
-api_key: !!null
-acc_type: !!null # "LIVE" | "DEMO"
-acc_number: !!null
