@@ -3,6 +3,10 @@
 
 from ig_service import IGService
 from ig_service_config import *
+import logging
+
+logger = logging.getLogger()
+logger.setLevel(logging.DEBUG)
 
 ig_service = IGService(username, password, api_key, acc_type)
 ig_service.create_session()
