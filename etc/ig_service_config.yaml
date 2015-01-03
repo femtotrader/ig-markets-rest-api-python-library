@@ -1,6 +1,5 @@
-config: 
-  username: ""
-  password: ""
-  api_key: ""
-  acc_type: "" # LIVE / DEMO
-  account_default: ""
+username: !!null
+password: !!null
+api_key: !!null
+acc_type: !!null # "LIVE" | "DEMO"
+acc_number: !!null

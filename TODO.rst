@@ -23,3 +23,12 @@
                 return('')
         else:
             return(value)
+
+    class IGServiceConfig(IGServiceConfigBase):
+        username = ""
+        password = ""
+        api_key = ""
+        acc_type = "DEMO" # LIVE / DEMO
+        acc_number = ""
+
+    config = IGServiceConfig(username, password, api_key, acc_type, acc_number)
