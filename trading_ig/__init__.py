@@ -14,6 +14,9 @@ import json
 import logging
 import traceback
 
+from version import __author__, __copyright__, __credits__, \
+    __license__, __version__, __maintainer__, __email__, __status__, __url__
+
 try:
     import pandas as pd
 except ImportError:
@@ -28,7 +31,7 @@ except ImportError:
     _HAS_BUNCH = False
     logging.warning("Can't import bunchify - return_bunch should be set to False")
 else:
-    _HAS_BUNCH = False
+    _HAS_BUNCH = True
 
 
 class RequestsSessionWithLog(requests.Session):

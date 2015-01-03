@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 #-*- coding:utf-8 -*-
 
+import trading_ig
 from trading_ig import IGService
 from trading_ig_config import *
 import logging
@@ -34,3 +35,5 @@ num_points = 10
 response = ig_service.fetch_historical_prices_by_epic_and_num_points(epic, resolution, num_points)
 df_ask = response['prices']['price']['ask']
 print("ask prices:\n%s" % df_ask)
+
+#print(trading_ig.__version__)

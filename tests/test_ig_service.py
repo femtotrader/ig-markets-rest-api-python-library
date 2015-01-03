@@ -6,6 +6,7 @@ Run unit tests using
 nosetests -s -v
 """
 
+import trading_ig
 from trading_ig import IGService
 #from trading_ig_config import * # defines username, password, api_key, acc_type, acc_number
 import pandas as pd
@@ -40,6 +41,8 @@ def test_ig_service():
     api_key = config.get("api_key")
     acc_type = config.get("acc_type")
     acc_number = config.get("acc_number")
+
+    assert(isinstance(trading_ig.__version__, basestring))
 
     ig_service = IGService(username, password, api_key, acc_type)
     ig_service.create_session()
