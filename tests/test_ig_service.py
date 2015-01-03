@@ -7,12 +7,39 @@ nosetests -s -v
 """
 
 from ig_service import IGService
-from ig_service_config import * # defines username, password, api_key, acc_type, acc_number
+#from ig_service_config import * # defines username, password, api_key, acc_type, acc_number
 import pandas as pd
 import pprint
+import os
+
+"""
+Environment variables must be set using
+
+export IG_SERVICE_USERNAME=""
+export IG_SERVICE_PASSWORD=""
+export IG_SERVICE_API_KEY=""
+export IG_SERVICE_ACC_TYPE="DEMO" # LIVE / DEMO
+export IG_SERVICE_ACC_NUMBER=""
+
+"""
+
+class ConfigEnvVar:
+    def __init__(self, env_var_base):
+        self.ENV_VAR_BASE = env_var_base
+
+    def get(self, key, default_value=None):
+        env_var = self.ENV_VAR_BASE + "_" + key.upper()
+        return(os.environ.get(env_var, default_value))
 
 def test_ig_service():
     pp = pprint.PrettyPrinter(indent=4)
+
+    config = ConfigEnvVar("IG_SERVICE")
+    username = config.get("username")
+    password = config.get("password")
+    api_key = config.get("api_key")
+    acc_type = config.get("acc_type")
+    acc_number = config.get("acc_number")
 
     ig_service = IGService(username, password, api_key, acc_type)
     ig_service.create_session()
