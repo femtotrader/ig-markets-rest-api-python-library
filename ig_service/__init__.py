@@ -25,10 +25,10 @@ else:
 try:
     from bunch import bunchify
 except ImportError:
-    _HAS_PANDAS = False
+    _HAS_BUNCH = False
     logging.warning("Can't import bunchify - return_bunch should be set to False")
 else:
-    _HAS_PANDAS = False
+    _HAS_BUNCH = False
 
 
 class RequestsSessionWithLog(requests.Session):
@@ -86,8 +86,8 @@ class IGService:
 
         self.parse_response = self.parse_response_with_exception
 
-        self.return_dataframe = True
-        self.return_bunch = True
+        self.return_dataframe = _HAS_PANDAS
+        self.return_bunch = _HAS_BUNCH
 
         #self.session = Session()
         self.session = RequestsSessionWithLog()
