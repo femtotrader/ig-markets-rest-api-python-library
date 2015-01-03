@@ -1,5 +1,34 @@
+.. image:: https://pypip.in/version/trading_ig/badge.svg
+    :target: https://pypi.python.org/pypi/trading_ig/
+    :alt: Latest Version
+
+.. image:: https://pypip.in/py_versions/trading_ig/badge.svg
+    :target: https://pypi.python.org/pypi/trading_ig/
+    :alt: Supported Python versions
+
+.. image:: https://pypip.in/format/trading_ig/badge.svg
+    :target: https://pypi.python.org/pypi/trading_ig/
+    :alt: Download format
+
+.. image:: https://pypip.in/license/trading_ig/badge.svg
+    :target: https://pypi.python.org/pypi/trading_ig/
+    :alt: License
+
+.. image:: https://pypip.in/status/trading_ig/badge.svg
+    :target: https://pypi.python.org/pypi/trading_ig/
+    :alt: Development Status
+
+.. image:: https://sourcegraph.com/api/repos/github.com/femtotrader/ig-markets-rest-api-python-library/.badges/status.png
+   :target: https://sourcegraph.com/github.com/femtotrader/ig-markets-rest-api-python-library
+
+.. image:: https://badges.gitter.im/Join%20Chat.svg
+   :target: https://gitter.im/femtotrader/ig-markets-rest-api-python-library?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge
+
+.. image:: https://travis-ci.org/femtotrader/ig-markets-rest-api-python-library.svg?branch=master
+    :target: https://travis-ci.org/femtotrader/ig-markets-rest-api-python-library
+
 IG Markets REST API - Python Library
-------------------------------------
+====================================
 
 A lightweight Python library that can be used to connect to the IG
 Markets REST API with a LIVE or DEMO account.
