@@ -13,6 +13,7 @@ from requests import Session
 import json
 import logging
 import traceback
+import os
 
 from version import __author__, __copyright__, __credits__, \
     __license__, __version__, __maintainer__, __email__, __status__, __url__
@@ -32,6 +33,20 @@ except ImportError:
     logging.warning("Can't import bunchify - return_bunch should be set to False")
 else:
     _HAS_BUNCH = True
+
+
+class ConfigEnvVar:
+    def __init__(self, env_var_base="IG_SERVICE"):
+        self.ENV_VAR_BASE = env_var_base
+
+    def _env_var(self, key):
+        return(self.ENV_VAR_BASE + "_" + key.upper())
+
+    def get(self, key, default_value=None):
+        return(os.environ.get(self._env_var(key), default_value))
+
+    def __getattr__(self, key):
+        return(os.environ[self._env_var(key)])
 
 
 class RequestsSessionWithLog(requests.Session):

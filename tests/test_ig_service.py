@@ -7,7 +7,7 @@ nosetests -s -v
 """
 
 import trading_ig
-from trading_ig import IGService
+from trading_ig import IGService, ConfigEnvVar
 #from trading_ig_config import * # defines username, password, api_key, acc_type, acc_number
 import pandas as pd
 import pprint
@@ -24,18 +24,13 @@ export IG_SERVICE_ACC_NUMBER=""
 
 """
 
-class ConfigEnvVar:
-    def __init__(self, env_var_base):
-        self.ENV_VAR_BASE = env_var_base
 
-    def get(self, key, default_value=None):
-        env_var = self.ENV_VAR_BASE + "_" + key.upper()
-        return(os.environ.get(env_var, default_value))
+
 
 def test_ig_service():
     pp = pprint.PrettyPrinter(indent=4)
 
-    config = ConfigEnvVar("IG_SERVICE")
+    config = ConfigEnvVar() # "IG_SERVICE"
     username = config.get("username")
     password = config.get("password")
     api_key = config.get("api_key")
