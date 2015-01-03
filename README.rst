@@ -89,6 +89,24 @@ with ``ig_service_config.py``
     acc_type = "DEMO" # LIVE / DEMO
     acc_number = "ABC123"
 
+Config can also be set as environment variable
+
+.. code:: bash
+
+    export IG_SERVICE_USERNAME="..."
+    export IG_SERVICE_PASSWORD="..."
+    export IG_SERVICE_API_KEY="..."
+    export IG_SERVICE_ACC_TYPE="DEMO" # LIVE / DEMO
+    export IG_SERVICE_ACC_NUMBER="..."
+
+and we can get it using
+
+.. code:: python
+
+    from ig_service import ConfigEnvVar
+    config = ConfigEnvVar("IG_SERVICE")
+    ig_service = IGService(config.username, config.password, config.api_key, config.acc_type)
+
 it should display:
 
 ::
