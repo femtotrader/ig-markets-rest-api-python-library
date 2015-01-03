@@ -59,12 +59,12 @@ instance of the IGService class.
 .. code:: python
 
     from trading_ig import IGService
-    from trading_ig_config import *
+    from trading_ig_config import config
 
-    ig_service = IGService(username, password, api_key, acc_type)
+    ig_service = IGService(config.username, config.password, config.api_key, config.acc_type)
     ig_service.create_session()
 
-    account_info = ig_service.switch_account(acc_number, False)
+    account_info = ig_service.switch_account(config.acc_number, False)
     print(account_info)
 
     open_positions = ig_service.fetch_open_positions()
@@ -83,11 +83,12 @@ with ``trading_ig_config.py``
 
 .. code:: python
 
-    username = "YOUR_USERNAME"
-    password = "YOUR_PASSWORD"
-    api_key = "YOUR_API_KEY"
-    acc_type = "DEMO" # LIVE / DEMO
-    acc_number = "ABC123"
+    class config(object):
+        username = "YOUR_USERNAME"
+        password = "YOUR_PASSWORD"
+        api_key = "YOUR_API_KEY"
+        acc_type = "DEMO" # LIVE / DEMO
+        acc_number = "ABC123"
 
 Config can also be set as environment variable
 
@@ -105,7 +106,6 @@ and we can get it using
 
     from trading_ig import ConfigEnvVar
     config = ConfigEnvVar("IG_SERVICE")
-    ig_service = IGService(config.username, config.password, config.api_key, config.acc_type)
 
 it should display:
 

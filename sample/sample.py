@@ -3,20 +3,20 @@
 
 import trading_ig
 from trading_ig import IGService
-from trading_ig_config import *
+from trading_ig_config import config
 import logging
 
 logger = logging.getLogger()
 logger.setLevel(logging.DEBUG)
 
 #config = IGServiceConfig()
-ig_service = IGService(username, password, api_key, acc_type)
+ig_service = IGService(config.username, config.password, config.api_key, config.acc_type)
 ig_service.create_session()
 
 accounts = ig_service.fetch_accounts()
 print("accounts:\n%s" % accounts)
 
-#account_info = ig_service.switch_account(acc_number, False)
+#account_info = ig_service.switch_account(config.acc_number, False)
 #print(account_info)
 
 open_positions = ig_service.fetch_open_positions()
