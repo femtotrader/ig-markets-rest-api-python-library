@@ -35,7 +35,7 @@ else:
     _HAS_BUNCH = True
 
 
-class ConfigEnvVar:
+class ConfigEnvVar(object):
     def __init__(self, env_var_base="IG_SERVICE"):
         self.ENV_VAR_BASE = env_var_base
 
@@ -47,7 +47,6 @@ class ConfigEnvVar:
 
     def __getattr__(self, key):
         return(os.environ[self._env_var(key)])
-
 
 class RequestsSessionWithLog(requests.Session):
     """
