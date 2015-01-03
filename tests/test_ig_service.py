@@ -40,6 +40,7 @@ def test_ig_service():
     assert(isinstance(trading_ig.__version__, basestring))
 
     ig_service = IGService(username, password, api_key, acc_type)
+    #ig_service = IGService(config.username, config.password, config.api_key, config.acc_type)
     ig_service.create_session()
 
     print("fetch_accounts")

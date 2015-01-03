@@ -22,7 +22,7 @@ try:
     import pandas as pd
 except ImportError:
     _HAS_PANDAS = False
-    logging.warning("Can't import pandas - return_dataframe should be set to False")
+    logging.warning("Can't import %r" % "pandas")
 else:
     _HAS_PANDAS = True
 
@@ -30,7 +30,7 @@ try:
     from bunch import bunchify
 except ImportError:
     _HAS_BUNCH = False
-    logging.warning("Can't import bunchify - return_bunch should be set to False")
+    logging.warning("Can't import %r" % "bunch")
 else:
     _HAS_BUNCH = True
 
