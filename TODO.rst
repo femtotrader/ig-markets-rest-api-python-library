@@ -37,5 +37,4 @@
 
 see
 
-
 http://opensourcehacker.com/2012/12/13/configuring-your-python-application-using-environment-variables/
