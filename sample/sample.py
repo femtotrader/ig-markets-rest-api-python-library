@@ -8,6 +8,7 @@ import logging
 logger = logging.getLogger()
 logger.setLevel(logging.DEBUG)
 
+#config = IGServiceConfig()
 ig_service = IGService(username, password, api_key, acc_type)
 ig_service.create_session()
 

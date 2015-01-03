@@ -32,3 +32,9 @@
         acc_number = ""
 
     config = IGServiceConfig(username, password, api_key, acc_type, acc_number)
+
+    IG_SERVICE_USERNAME
+
+see
+
+http://opensourcehacker.com/2012/12/13/configuring-your-python-application-using-environment-variables/
