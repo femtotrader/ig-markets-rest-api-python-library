@@ -5,7 +5,7 @@ from setuptools import setup, find_packages  # Always prefer setuptools over dis
 from codecs import open  # To use a consistent encoding
 from os import path
 
-NAME = 'ig_service'
+NAME = 'trading_ig'
 with open("%s/version.py" % NAME) as f:
     exec(f.read())
 
@@ -25,7 +25,7 @@ setup(
     #version='0.0.1',
     version=__version__,
 
-    description='trading with Python and IG market API',
+    description='trading with Python and IG markets API',
     long_description=readme(),
 
     # The project's main homepage.

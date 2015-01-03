@@ -6,8 +6,8 @@ Run unit tests using
 nosetests -s -v
 """
 
-from ig_service import IGService
-#from ig_service_config import * # defines username, password, api_key, acc_type, acc_number
+from trading_ig import IGService
+#from trading_ig_config import * # defines username, password, api_key, acc_type, acc_number
 import pandas as pd
 import pprint
 import os

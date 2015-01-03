@@ -1,8 +1,8 @@
 #!/usr/bin/env python
 #-*- coding:utf-8 -*-
 
-from ig_service import IGService
-from ig_service_config import *
+from trading_ig import IGService
+from trading_ig_config import *
 import logging
 
 logger = logging.getLogger()
