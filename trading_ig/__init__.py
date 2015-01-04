@@ -581,6 +581,15 @@ class IGService:
 
 
     def format_prices(self, prices, flag_calc_spread=True):
+        def cols(typ):
+            return({
+                'openPrice.%s' % typ: 'Open',
+                'highPrice.%s' % typ: 'High',
+                'lowPrice.%s' % typ: 'Low',
+                'closePrice.%s' % typ: 'Close',
+                'lastTradedVolume': 'Volume'                
+            })
+
         """Format prices data as a DataFrame with hierarchical columns"""
         df = json_normalize(prices)
         df = df.set_index('snapshotTime')
@@ -606,13 +615,14 @@ class IGService:
             df_spread = df_ask - df_bid
 
         df_last = df[['openPrice.lastTraded', 'highPrice.lastTraded', 'lowPrice.lastTraded', 'closePrice.lastTraded', 'lastTradedVolume']]
-        df_last = df_last.rename(columns={
-            'openPrice.lastTraded': 'Open',
-            'highPrice.lastTraded': 'High',
-            'lowPrice.lastTraded': 'Low',
-            'closePrice.lastTraded': 'Close',
-            'lastTradedVolume': 'Volume'
-        })
+        df_last = df_last.rename(columns=cols('lastTraded'))
+        #df_last = df_last.rename(columns={
+        #    'openPrice.lastTraded': 'Open',
+        #    'highPrice.lastTraded': 'High',
+        #    'lowPrice.lastTraded': 'Low',
+        #    'closePrice.lastTraded': 'Close',
+        #    'lastTradedVolume': 'Volume'
+        #})
 
         if not flag_calc_spread:
             df2 = pd.concat([df_bid, df_ask, df_last], axis=1, keys=['bid', 'ask', 'last'])
