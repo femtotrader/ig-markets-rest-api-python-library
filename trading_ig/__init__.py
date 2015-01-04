@@ -67,7 +67,7 @@ class RequestsSessionWithLog(requests.Session):
             'Accept': 'application/json; charset=UTF-8' 
         }
 
-        self.create = self._create_first
+        #self.create = self._create_first
 
         #print("="*100)
         super(RequestsSessionWithLog, self).__init__()
@@ -94,7 +94,7 @@ class RequestsSessionWithLog(requests.Session):
         response = super(RequestsSessionWithLog, self).put(url, **kwargs)
         return(response)
 
-    def _url(self, endpoint)
+    def _url(self, endpoint):
         return(self.BASE_URL + endpoint)
 
     #def create(self, endpoint, params): # CREATE = POST with LOGGED_IN_HEADERS (or BASIC_HEADERS first time)
@@ -102,29 +102,29 @@ class RequestsSessionWithLog(requests.Session):
 
     #def _create_first(self, endpoint, params):
     #    url = self._url(endpoint)
-    #    response = super(RequestsSessionWithLog, self).post(url, data=json.dumps(params), headers=self.BASIC_HEADERS)
+    #    response = self.post(url, data=json.dumps(params), headers=self.BASIC_HEADERS)
     #    self._set_headers(response.headers, True)
     #    self.create = self._create_logged_in
     #    return(response)
 
     #def _create_logged_in(self, endpoint, params):
     #    url = self._url(endpoint)
-    #    response = super(RequestsSessionWithLog, self).post(url, data=json.dumps(params), headers=self.LOGGED_IN_HEADERS)
+    #    response = self.post(url, data=json.dumps(params), headers=self.LOGGED_IN_HEADERS)
     #    pass
 
     #def read(self, endpoint): # READ = GET
     #    url = self._url(endpoint)
-    #    response = super(RequestsSessionWithLog, self).get(url, headers=self.LOGGED_IN_HEADERS)
+    #    response = self.get(url, headers=self.LOGGED_IN_HEADERS)
     #    return(response)
 
     #def update(self, endpoint, params): # UPDATE = PUT
     #    url = self._url(endpoint)
-    #    response = super(RequestsSessionWithLog, self).put(url, data=json.dumps(params), headers=self.LOGGED_IN_HEADERS)
+    #    response = self.put(url, data=json.dumps(params), headers=self.LOGGED_IN_HEADERS)
     #    return(response)
 
     #def delete(self, endpoint, params): # DELETE = POST with DELETE_HEADERS
     #    url = self._url(endpoint)
-    #    response = super(RequestsSessionWithLog, self).post(url, data=json.dumps(params), headers=self.DELETE_HEADERS)
+    #    response = self.post(url, data=json.dumps(params), headers=self.DELETE_HEADERS)
     #    return(response)
 
     def _set_headers(self, response_headers, update_cst):
@@ -195,7 +195,7 @@ class IGService:
         self.return_bunch = _HAS_BUNCH
 
         #self.session = Session()
-        self.session = RequestsSessionWithLog()
+        self.session = RequestsSessionWithLog(self.BASE_URL, self.API_KEY)
 
         #self.create_session()
 
