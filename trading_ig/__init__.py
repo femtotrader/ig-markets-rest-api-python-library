@@ -52,7 +52,23 @@ class RequestsSessionWithLog(requests.Session):
     """
     Requests Session with log
     """
-    def __init__(self):
+
+    BASIC_HEADERS = None
+    LOGGED_IN_HEADERS = None
+    DELETE_HEADERS = None
+
+    def __init__(self, base_url, api_key):
+        self.BASE_URL = base_url
+        self.API_KEY = api_key
+
+        self.BASIC_HEADERS = { 
+            'X-IG-API-KEY': self.API_KEY,
+            'Content-Type': 'application/json', 
+            'Accept': 'application/json; charset=UTF-8' 
+        }
+
+        self.create = self._create_first
+
         #print("="*100)
         super(RequestsSessionWithLog, self).__init__()
 
@@ -78,17 +94,65 @@ class RequestsSessionWithLog(requests.Session):
         response = super(RequestsSessionWithLog, self).put(url, **kwargs)
         return(response)
 
-    #def create(self, url, **kwargs): # CREATE = POST with LOGGED_IN_HEADERS (or BASIC_HEADERS first time)
+    def _url(self, endpoint)
+        return(self.BASE_URL + endpoint)
+
+    #def create(self, endpoint, params): # CREATE = POST with LOGGED_IN_HEADERS (or BASIC_HEADERS first time)
+    #    return(self._create_first(endpoint, params))
+
+    #def _create_first(self, endpoint, params):
+    #    url = self._url(endpoint)
+    #    response = super(RequestsSessionWithLog, self).post(url, data=json.dumps(params), headers=self.BASIC_HEADERS)
+    #    self._set_headers(response.headers, True)
+    #    self.create = self._create_logged_in
+    #    return(response)
+
+    #def _create_logged_in(self, endpoint, params):
+    #    url = self._url(endpoint)
+    #    response = super(RequestsSessionWithLog, self).post(url, data=json.dumps(params), headers=self.LOGGED_IN_HEADERS)
     #    pass
 
-    #def read(self, url, **kwargs): # READ = GET
-    #    pass
+    #def read(self, endpoint): # READ = GET
+    #    url = self._url(endpoint)
+    #    response = super(RequestsSessionWithLog, self).get(url, headers=self.LOGGED_IN_HEADERS)
+    #    return(response)
 
-    #def update(self, url, **kwargs): # UPDATE = PUT
-    #    pass
+    #def update(self, endpoint, params): # UPDATE = PUT
+    #    url = self._url(endpoint)
+    #    response = super(RequestsSessionWithLog, self).put(url, data=json.dumps(params), headers=self.LOGGED_IN_HEADERS)
+    #    return(response)
 
-    #def delete(self, url, **kwargs): # DELETE = POST with DELETE_HEADERS
-    #    pass
+    #def delete(self, endpoint, params): # DELETE = POST with DELETE_HEADERS
+    #    url = self._url(endpoint)
+    #    response = super(RequestsSessionWithLog, self).post(url, data=json.dumps(params), headers=self.DELETE_HEADERS)
+    #    return(response)
+
+    def _set_headers(self, response_headers, update_cst):
+        """Sets headers"""
+        if update_cst == True:
+            self.CLIENT_TOKEN = response_headers['CST']
+
+        try:
+            self.SECURITY_TOKEN = response_headers['X-SECURITY-TOKEN']
+        except:
+            self.SECURITY_TOKEN = None
+
+        self.LOGGED_IN_HEADERS = { 
+            'X-IG-API-KEY': self.API_KEY, 
+            'X-SECURITY-TOKEN': self.SECURITY_TOKEN, 
+            'CST': self.CLIENT_TOKEN, 
+            'Content-Type': 'application/json', 
+            'Accept': 'application/json; charset=UTF-8' 
+        }
+
+        self.DELETE_HEADERS = { 
+            'X-IG-API-KEY': self.API_KEY, 
+            'X-SECURITY-TOKEN': self.SECURITY_TOKEN, 
+            'CST': self.CLIENT_TOKEN, 
+            'Content-Type': 'application/json', 
+            'Accept': 'application/json; charset=UTF-8',
+            '_method': 'DELETE'
+        }
 
 class IGService:
 
