@@ -52,6 +52,8 @@ class RequestsSessionWithLog(requests.Session):
     """
     Requests Session with log
     """
+    #def __init__(self):
+    #    print("="*100)
 
     def get(self, url, **kwargs):
         try:
@@ -59,12 +61,33 @@ class RequestsSessionWithLog(requests.Session):
         except:
             params = {}
         if params=={}:
-            logging.debug("Request to '%s'" % url)
+            logging.debug("GET request to '%s'" % url)
         else:
-            logging.debug("Request to '%s' with '%s' using '%s'" % (url, params, url+'?'+urlencode(params)))
+            logging.debug("GET request to '%s' with '%s' using '%s'" % (url, params, url+'?'+urlencode(params)))
         response = super(RequestsSessionWithLog, self).get(url, **kwargs)
         return(response)
 
+    def post(self, url, **kwargs):
+        logging.debug("POST request to '%s' with '%s'" % (url, kwargs))
+        response = super(RequestsSessionWithLog, self).post(url, **kwargs)
+        return(response)
+
+    def put(self, url, **kwargs):
+        logging.debug("PUT request to '%s' with '%s'" % (url, kwargs))
+        response = super(RequestsSessionWithLog, self).put(url, **kwargs)
+        return(response)
+
+    #def create(self, url, **kwargs): # CREATE = POST with LOGGED_IN_HEADERS (or BASIC_HEADERS first time)
+    #    pass
+
+    #def read(self, url, **kwargs): # READ = GET
+    #    pass
+
+    #def update(self, url, **kwargs): # UPDATE = PUT
+    #    pass
+
+    #def delete(self, url, **kwargs): # DELETE = POST with DELETE_HEADERS
+    #    pass
 
 class IGService:
 
