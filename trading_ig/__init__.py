@@ -228,8 +228,8 @@ class IGService:
 
     def fetch_accounts(self):
         """Returns a list of accounts belonging to the logged-in client"""
-        endpoint = '/accounts'
         params = {}
+        endpoint = '/accounts'
         response = self.session.read(endpoint, params)
         data = self.parse_response(response.text)
         if self.return_dataframe:
@@ -248,8 +248,8 @@ class IGService:
 
     def fetch_account_activity_by_period(self, milliseconds):
         """Returns the account activity history for the last specified period"""
-        endpoint = '/history/activity/%s' % milliseconds
         params = {}
+        endpoint = '/history/activity/%s' % milliseconds
         response = self.session.read(endpoint, params)
         data = self.parse_response(response.text)
         if self.return_dataframe:
@@ -264,8 +264,8 @@ class IGService:
 
     def fetch_transaction_history_by_type_and_period(self, milliseconds, trans_type):
         """Returns the transaction history for the specified transaction type and period"""
-        endpoint = '/history/transactions/%s/%s' % (trans_type, milliseconds)
         params = {}
+        endpoint = '/history/transactions/%s/%s' % (trans_type, milliseconds)
         response = self.session.read(endpoint, params)
         data = self.parse_response(response.text)
         if self.return_dataframe:
@@ -286,16 +286,16 @@ class IGService:
 
     def fetch_deal_by_deal_reference(self, deal_reference):
         """Returns a deal confirmation for the given deal reference"""
-        endpoint = '/confirms/%s' % deal_reference
         params = {}
+        endpoint = '/confirms/%s' % deal_reference
         response = self.session.read(endpoint, params)
         data = self.parse_response(response.text)
         return(data)
 
     def fetch_open_positions(self):
         """Returns all open positions for the active account"""
-        endpoint = '/positions'
         params = {}
+        endpoint = '/positions'
         response = self.session.read(endpoint, params)
         data = self.parse_response(response.text)
         if self.return_dataframe:
@@ -327,7 +327,6 @@ class IGService:
             'quoteId': quote_id,
             'size': size
         }
-
         endpoint = '/positions/otc'
         response = self.session.delete(endpoint, params)
 
@@ -385,8 +384,8 @@ class IGService:
 
     def fetch_working_orders(self):
         """Returns all open working orders for the active account"""
-        endpoint = '/workingorders'
         params = {}
+        endpoint = '/workingorders'
         response = self.session.read(endpoint, params)
         data = self.parse_response(response.text)
         if self.return_dataframe:
@@ -431,7 +430,6 @@ class IGService:
             'timeInForce': time_in_force,
             'type': order_type
         }
-
         endpoint = '/workingorders/otc'
         response = self.session.create(endpoint, params)
 
@@ -466,7 +464,6 @@ class IGService:
             'timeInForce': time_in_force,
             'type': order_type
         }
-
         endpoint = '/workingorders/otc/%s' % deal_id
         response = self.session.update(endpoint)
 
@@ -484,8 +481,8 @@ class IGService:
 
     def fetch_client_sentiment_by_instrument(self, market_id):
         """Returns the client sentiment for the given instrument's market"""
-        endpoint = '/clientsentiment/%s' % market_id
         params = {}
+        endpoint = '/clientsentiment/%s' % market_id
         response = self.session.read(endpoint, params)
         data = self.parse_response(response.text)
         if self.return_bunch:
@@ -494,8 +491,8 @@ class IGService:
 
     def fetch_related_client_sentiment_by_instrument(self, market_id):
         """Returns a list of related (also traded) client sentiment for the given instrument's market"""
-        endpoint = '/clientsentiment/related/%s' % market_id
         params = {}
+        endpoint = '/clientsentiment/related/%s' % market_id
         response = self.session.read(endpoint, params)
         data = self.parse_response(response.text)
         if self.return_dataframe:
@@ -504,8 +501,8 @@ class IGService:
 
     def fetch_top_level_navigation_nodes(self):
         """Returns all top-level nodes (market categories) in the market navigation hierarchy."""
-        endpoint = '/marketnavigation'
         params = {}
+        endpoint = '/marketnavigation'
         response = self.session.read(endpoint, params)
         data = self.parse_response(response.text)
         if self.return_dataframe:
@@ -523,8 +520,8 @@ class IGService:
 
     def fetch_sub_nodes_by_node(self, node):
         """Returns all sub-nodes of the given node in the market navigation hierarchy"""
-        endpoint = '/marketnavigation/%s' % node
         params = {}
+        endpoint = '/marketnavigation/%s' % node
         response = self.session.read(endpoint, params)
         data = self.parse_response(response.text)
         if self.return_dataframe:
@@ -534,8 +531,8 @@ class IGService:
 
     def fetch_market_by_epic(self, epic):
         """Returns the details of the given market"""
-        endpoint = '/markets/%s' % epic
         params = {}
+        endpoint = '/markets/%s' % epic
         response = self.session.read(endpoint, params)
         data = self.parse_response(response.text)
         if self.return_bunch:
@@ -579,8 +576,8 @@ class IGService:
 
     def fetch_historical_prices_by_epic_and_num_points(self, epic, resolution, num_points):
         """Returns a list of historical prices for the given epic, resolution, number of points"""
-        endpoint = "/prices/{epic}/{resolution}/{numpoints}".format(epic=epic, resolution=resolution, numpoints=num_points)
         params = {}
+        endpoint = "/prices/{epic}/{resolution}/{numpoints}".format(epic=epic, resolution=resolution, numpoints=num_points)
         response = self.session.read(endpoint, params)
         data = self.parse_response(response.text)
         if self.return_dataframe:
@@ -624,8 +621,8 @@ class IGService:
 
     def fetch_all_watchlists(self):
         """Returns all watchlists belonging to the active account"""
-        endpoint = '/watchlists'
         params = {}
+        endpoint = '/watchlists'
         response = self.session.read(endpoint, params)
         data = self.parse_response(response.text)
         if self.return_dataframe:
@@ -638,7 +635,6 @@ class IGService:
             'name': name, 
             'epics': epics
         }
-
         endpoint = '/watchlists'
         response = self.session.create(endpoint, params)
         data = self.parse_response(response.text)
@@ -654,8 +650,8 @@ class IGService:
 
     def fetch_watchlist_markets(self, watchlist_id):
         """Returns the given watchlist's markets"""
-        endpoint = '/watchlists/%s' % watchlist_id
         params = {}
+        endpoint = '/watchlists/%s' % watchlist_id
         response = self.session.read(endpoint, params)
         data = self.parse_response(response.text)
         if self.return_dataframe:
@@ -709,7 +705,6 @@ class IGService:
             'accountId': account_id, 
             'defaultAccount': default_account
         }
-
         endpoint = '/session'
         response = self.session.update(endpoint, params)
         self._set_headers(response.headers, False)
@@ -724,8 +719,8 @@ class IGService:
     
     def get_client_apps(self):
         """Returns a list of client-owned applications"""
-        endpoint = '/operations/application'
         params = {}
+        endpoint = '/operations/application'
         response = self.session.read(endpoint, params)
         data = self.parse_response(response.text)
         return(data)
@@ -738,7 +733,6 @@ class IGService:
             'apiKey': api_key, 
             'status': status
         }
-
         endpoint = '/operations/application'
         response = self.session.update(endpoint, params)
         data = self.parse_response(response.text)
