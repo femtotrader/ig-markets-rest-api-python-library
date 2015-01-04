@@ -48,14 +48,18 @@ class ConfigEnvVar(object):
     def __getattr__(self, key):
         return(os.environ[self._env_var(key)])
 
-class RequestsSessionWithLog(requests.Session):
+class IG_Session_CRUD(object):
     """
-    Requests Session with log
+    Session with CRUD operation
     """
+    CLIENT_TOKEN = None
+    SECURITY_TOKEN = None
 
     BASIC_HEADERS = None
     LOGGED_IN_HEADERS = None
     DELETE_HEADERS = None
+
+    BASE_URL = None
 
     def __init__(self, base_url, api_key):
         self.BASE_URL = base_url
@@ -67,65 +71,45 @@ class RequestsSessionWithLog(requests.Session):
             'Accept': 'application/json; charset=UTF-8' 
         }
 
-        #self.create = self._create_first
+        self.session = Session()
 
-        #print("="*100)
-        super(RequestsSessionWithLog, self).__init__()
-
-    def get(self, url, **kwargs):
-        try:
-            params = kwargs['params']
-        except:
-            params = {}
-        if params=={}:
-            logging.debug("GET request to '%s'" % url)
-        else:
-            logging.debug("GET request to '%s' with '%s' using '%s'" % (url, params, url+'?'+urlencode(params)))
-        response = super(RequestsSessionWithLog, self).get(url, **kwargs)
-        return(response)
-
-    def post(self, url, **kwargs):
-        #logging.debug("POST request to '%s' with '%s'" % (url, kwargs))
-        response = super(RequestsSessionWithLog, self).post(url, **kwargs)
-        return(response)
-
-    def put(self, url, **kwargs):
-        #logging.debug("PUT request to '%s' with '%s'" % (url, kwargs))
-        response = super(RequestsSessionWithLog, self).put(url, **kwargs)
-        return(response)
-
+        self.create = self._create_first
+        
     def _url(self, endpoint):
+        """Returns url from endpoint and base url"""
         return(self.BASE_URL + endpoint)
 
-    #def create(self, endpoint, params): # CREATE = POST with LOGGED_IN_HEADERS (or BASIC_HEADERS first time)
-    #    return(self._create_first(endpoint, params))
+    def _create_first(self, endpoint, params):
+        """Create first = POST with headers=BASIC_HEADERS"""
+        url = self._url(endpoint)
+        response = self.session.post(url, data=json.dumps(params), headers=self.BASIC_HEADERS)
+        self._set_headers(response.headers, True)
+        self.create = self._create_logged_in
+        return(response)
 
-    #def _create_first(self, endpoint, params):
-    #    url = self._url(endpoint)
-    #    response = self.post(url, data=json.dumps(params), headers=self.BASIC_HEADERS)
-    #    self._set_headers(response.headers, True)
-    #    self.create = self._create_logged_in
-    #    return(response)
+    def _create_logged_in(self, endpoint, params):
+        """Create when logged in = POST with headers=LOGGED_IN_HEADERS"""
+        url = self._url(endpoint)
+        response = self.session.post(url, data=json.dumps(params), headers=self.LOGGED_IN_HEADERS)
+        return(response)
 
-    #def _create_logged_in(self, endpoint, params):
-    #    url = self._url(endpoint)
-    #    response = self.post(url, data=json.dumps(params), headers=self.LOGGED_IN_HEADERS)
-    #    pass
+    def read(self, endpoint, params):
+        """Read = GET with headers=LOGGED_IN_HEADERS"""
+        url = self._url(endpoint)
+        response = self.session.get(url, params=params, headers=self.LOGGED_IN_HEADERS)
+        return(response)
 
-    #def read(self, endpoint): # READ = GET
-    #    url = self._url(endpoint)
-    #    response = self.get(url, headers=self.LOGGED_IN_HEADERS)
-    #    return(response)
+    def update(self, endpoint, params):
+        """Update = PUT with headers=LOGGED_IN_HEADERS"""
+        url = self._url(endpoint)
+        response = self.session.put(url, data=json.dumps(params), headers=self.LOGGED_IN_HEADERS)
+        return(response)
 
-    #def update(self, endpoint, params): # UPDATE = PUT
-    #    url = self._url(endpoint)
-    #    response = self.put(url, data=json.dumps(params), headers=self.LOGGED_IN_HEADERS)
-    #    return(response)
-
-    #def delete(self, endpoint, params): # DELETE = POST with DELETE_HEADERS
-    #    url = self._url(endpoint)
-    #    response = self.post(url, data=json.dumps(params), headers=self.DELETE_HEADERS)
-    #    return(response)
+    def delete(self, endpoint, params):
+        """Delete = POST with DELETE_HEADERS"""
+        url = self._url(endpoint)
+        response = self.session.post(url, data=json.dumps(params), headers=self.DELETE_HEADERS)
+        return(response)
 
     def _set_headers(self, response_headers, update_cst):
         """Sets headers"""
@@ -156,13 +140,6 @@ class RequestsSessionWithLog(requests.Session):
 
 class IGService:
 
-    CLIENT_TOKEN = None
-    SECURITY_TOKEN = None
-
-    BASIC_HEADERS = None
-    LOGGED_IN_HEADERS = None
-    DELETE_HEADERS = None
-
     D_BASE_URL = {
         'live': 'https://api.ig.com/gateway/deal',
         'demo': 'https://demo-api.ig.com/gateway/deal'
@@ -183,24 +160,15 @@ class IGService:
         except:
             raise(Exception("Invalid account type specified, please provide LIVE or DEMO."))
 
-        self.BASIC_HEADERS = { 
-            'X-IG-API-KEY': self.API_KEY,
-            'Content-Type': 'application/json', 
-            'Accept': 'application/json; charset=UTF-8' 
-        }
-
         self.parse_response = self.parse_response_with_exception
 
         self.return_dataframe = _HAS_PANDAS
         self.return_bunch = _HAS_BUNCH
 
-        #self.session = Session()
-        self.session = RequestsSessionWithLog(self.BASE_URL, self.API_KEY)
+        self.session = IG_Session_CRUD(self.BASE_URL, self.API_KEY)
 
         #self.create_session()
 
-    def _url(self, endpoint):
-        return(self.BASE_URL + endpoint)
 
     ########## PARSE_RESPONSE ##########
 
@@ -259,8 +227,8 @@ class IGService:
     def fetch_accounts(self):
         """Returns a list of accounts belonging to the logged-in client"""
         endpoint = '/accounts'
-        url = self._url(endpoint)
-        response = self.session.get(url, headers=self.LOGGED_IN_HEADERS)
+        params = {}
+        response = self.session.read(endpoint, params)
         data = self.parse_response(response.text)
         if self.return_dataframe:
             data = pd.DataFrame(data['accounts'])
@@ -279,8 +247,8 @@ class IGService:
     def fetch_account_activity_by_period(self, milliseconds):
         """Returns the account activity history for the last specified period"""
         endpoint = '/history/activity/%s' % milliseconds
-        url = self._url(endpoint)
-        response = self.session.get(url, headers=self.LOGGED_IN_HEADERS)
+        params = {}
+        response = self.session.read(endpoint, params)
         data = self.parse_response(response.text)
         if self.return_dataframe:
             data = pd.DataFrame(data['activities'])
@@ -295,8 +263,8 @@ class IGService:
     def fetch_transaction_history_by_type_and_period(self, milliseconds, trans_type):
         """Returns the transaction history for the specified transaction type and period"""
         endpoint = '/history/transactions/%s/%s' % (trans_type, milliseconds)
-        url = self._url(endpoint)
-        response = self.session.get(url, headers=self.LOGGED_IN_HEADERS)
+        params = {}
+        response = self.session.read(endpoint, params)
         data = self.parse_response(response.text)
         if self.return_dataframe:
             data = pd.DataFrame(data['transactions'])
@@ -317,16 +285,16 @@ class IGService:
     def fetch_deal_by_deal_reference(self, deal_reference):
         """Returns a deal confirmation for the given deal reference"""
         endpoint = '/confirms/%s' % deal_reference
-        url = self._url(endpoint)
-        response = self.session.get(url, headers=self.LOGGED_IN_HEADERS)
+        params = {}
+        response = self.session.read(endpoint, params)
         data = self.parse_response(response.text)
         return(data)
 
     def fetch_open_positions(self):
         """Returns all open positions for the active account"""
         endpoint = '/positions'
-        url = self._url(endpoint)
-        response = self.session.get(url, headers=self.LOGGED_IN_HEADERS)
+        params = {}
+        response = self.session.read(endpoint, params)
         data = self.parse_response(response.text)
         if self.return_dataframe:
             lst = data['positions']
@@ -359,8 +327,7 @@ class IGService:
         }
 
         endpoint = '/positions/otc'
-        url = self._url(endpoint)
-        response = self.session.post(url, data=json.dumps(params), headers=self.DELETE_HEADERS)
+        response = self.session.delete(endpoint, params)
 
         if response.status_code == 200:
             deal_reference = json.loads(response.text)['dealReference']
@@ -390,8 +357,7 @@ class IGService:
         }
 
         endpoint = '/positions/otc'
-        url = self._url(endpoint)
-        response = self.session.post(url, data=json.dumps(params), headers=self.LOGGED_IN_HEADERS)
+        response = self.session.create(endpoint, params)
 
         if response.status_code == 200:
             deal_reference = json.loads(response.text)['dealReference']
@@ -407,8 +373,7 @@ class IGService:
         }
 
         endpoint = '/positions/otc/%s' % deal_id
-        url = self._url(endpoint)
-        response = self.session.put(url, data=json.dumps(params), headers=self.LOGGED_IN_HEADERS)
+        response = self.session.update(endpoint)
 
         if response.status_code == 200:
             deal_reference = json.loads(response.text)['dealReference']
@@ -419,8 +384,8 @@ class IGService:
     def fetch_working_orders(self):
         """Returns all open working orders for the active account"""
         endpoint = '/workingorders'
-        url = self._url(endpoint)
-        response = self.session.get(url, headers=self.LOGGED_IN_HEADERS)
+        params = {}
+        response = self.session.read(endpoint, params)
         data = self.parse_response(response.text)
         if self.return_dataframe:
             lst = data['workingOrders']
@@ -466,8 +431,7 @@ class IGService:
         }
 
         endpoint = '/workingorders/otc'
-        url = self._url(endpoint)
-        response = self.session.post(url, data=json.dumps(params), headers=self.LOGGED_IN_HEADERS)
+        response = self.session.create(endpoint, params)
 
         if response.status_code == 200:
             deal_reference = json.loads(response.text)['dealReference']
@@ -479,8 +443,7 @@ class IGService:
         """Deletes an OTC working order"""
         params = {}
         endpoint = '/workingorders/otc/%s' % deal_id
-        url = self._url(endpoint)
-        response = self.session.post(url, data=json.dumps(params), headers=self.DELETE_HEADERS)
+        response = self.session.delete(endpoint, params)
 
         if response.status_code == 200:
             deal_reference = json.loads(response.text)['dealReference']
@@ -503,8 +466,7 @@ class IGService:
         }
 
         endpoint = '/workingorders/otc/%s' % deal_id
-        url = self._url(endpoint)
-        response = self.session.put(url, data=json.dumps(params), headers=self.LOGGED_IN_HEADERS)
+        response = self.session.update(endpoint)
 
         if response.status_code == 200:
             deal_reference = json.loads(response.text)['dealReference']
@@ -521,8 +483,8 @@ class IGService:
     def fetch_client_sentiment_by_instrument(self, market_id):
         """Returns the client sentiment for the given instrument's market"""
         endpoint = '/clientsentiment/%s' % market_id
-        url = self._url(endpoint)
-        response = self.session.get(url, headers=self.LOGGED_IN_HEADERS)
+        params = {}
+        response = self.session.read(endpoint, params)
         data = self.parse_response(response.text)
         if self.return_bunch:
             data = bunchify(data)
@@ -531,8 +493,8 @@ class IGService:
     def fetch_related_client_sentiment_by_instrument(self, market_id):
         """Returns a list of related (also traded) client sentiment for the given instrument's market"""
         endpoint = '/clientsentiment/related/%s' % market_id
-        url = self._url(endpoint)
-        response = self.session.get(url, headers=self.LOGGED_IN_HEADERS)
+        params = {}
+        response = self.session.read(endpoint, params)
         data = self.parse_response(response.text)
         if self.return_dataframe:
             data = pd.DataFrame(data['clientSentiments'])
@@ -541,8 +503,8 @@ class IGService:
     def fetch_top_level_navigation_nodes(self):
         """Returns all top-level nodes (market categories) in the market navigation hierarchy."""
         endpoint = '/marketnavigation'
-        url = self._url(endpoint)
-        response = self.session.get(url, headers=self.LOGGED_IN_HEADERS)
+        params = {}
+        response = self.session.read(endpoint, params)
         data = self.parse_response(response.text)
         if self.return_dataframe:
             data['markets'] = pd.DataFrame(data['markets'])
@@ -560,8 +522,8 @@ class IGService:
     def fetch_sub_nodes_by_node(self, node):
         """Returns all sub-nodes of the given node in the market navigation hierarchy"""
         endpoint = '/marketnavigation/%s' % node
-        url = self._url(endpoint)
-        response = self.session.get(url, headers=self.LOGGED_IN_HEADERS)
+        params = {}
+        response = self.session.read(endpoint, params)
         data = self.parse_response(response.text)
         if self.return_dataframe:
             data['markets'] = pd.DataFrame(data['markets'])
@@ -571,8 +533,8 @@ class IGService:
     def fetch_market_by_epic(self, epic):
         """Returns the details of the given market"""
         endpoint = '/markets/%s' % epic
-        url = self._url(endpoint)
-        response = self.session.get(url, headers=self.LOGGED_IN_HEADERS)
+        params = {}
+        response = self.session.read(endpoint, params)
         data = self.parse_response(response.text)
         if self.return_bunch:
             data = bunchify(data)
@@ -580,9 +542,11 @@ class IGService:
 
     def search_markets(self, search_term):
         """Returns all markets matching the search term"""
-        endpoint = '/markets?searchTerm=%s' % search_term
-        url = self._url(endpoint)
-        response = self.session.get(url, headers=self.LOGGED_IN_HEADERS)
+        endpoint = '/markets'
+        params = {
+            'searchTerm': search_term
+        }
+        response = self.session.read(endpoint, params)
         data = self.parse_response(response.text)
         if self.return_dataframe:
             data = pd.DataFrame(data['markets'])
@@ -614,8 +578,8 @@ class IGService:
     def fetch_historical_prices_by_epic_and_num_points(self, epic, resolution, num_points):
         """Returns a list of historical prices for the given epic, resolution, number of points"""
         endpoint = "/prices/{epic}/{resolution}/{numpoints}".format(epic=epic, resolution=resolution, numpoints=num_points)
-        url = self._url(endpoint)
-        response = self.session.get(url, headers=self.LOGGED_IN_HEADERS)
+        params = {}
+        response = self.session.read(endpoint, params)
         data = self.parse_response(response.text)
         if self.return_dataframe:
             data['prices'] = self.format_prices(data['prices'])
@@ -623,9 +587,12 @@ class IGService:
 
     def fetch_historical_prices_by_epic_and_date_range(self, epic, resolution, start_date, end_date):
         """Returns a list of historical prices for the given epic, resolution, multiplier and date range"""
-        endpoint = "/prices/{epic}/{resolution}/?startdate={start_date}&enddate={end_date}".format(epic=epic, resolution=resolution, start_date=start_date, end_date=end_date)
-        url = self._url(endpoint)
-        response = self.session.get(url, headers=self.LOGGED_IN_HEADERS)
+        endpoint = "/prices/{epic}/{resolution}".format(epic=epic, resolution=resolution)
+        params = {
+            'startdate': start_date,
+            'enddate': end_date
+        }
+        response = self.session.read(endpoint, params)
         data = self.parse_response(response.text)
         if self.return_dataframe:
             data['prices'] = self.format_prices(data['prices'])
@@ -640,8 +607,8 @@ class IGService:
     def fetch_all_watchlists(self):
         """Returns all watchlists belonging to the active account"""
         endpoint = '/watchlists'
-        url = self._url(endpoint)
-        response = self.session.get(url, headers=self.LOGGED_IN_HEADERS)
+        params = {}
+        response = self.session.read(endpoint, params)
         data = self.parse_response(response.text)
         if self.return_dataframe:
             data = pd.DataFrame(data['watchlists'])
@@ -655,8 +622,7 @@ class IGService:
         }
 
         endpoint = '/watchlists'
-        url = self._url(endpoint)
-        response = self.session.post(url, data=json.dumps(params), headers=self.LOGGED_IN_HEADERS)
+        response = self.session.create(endpoint, params)
         data = self.parse_response(response.text)
         return(data)
 
@@ -664,16 +630,15 @@ class IGService:
         """Deletes a watchlist"""
         params = {}
         endpoint = '/watchlists/%s' % watchlist_id
-        url = self._url(endpoint)
-        response = self.session.post(url, data=json.dumps(params), headers=self.DELETE_HEADERS)
+        response = self.session.delete(endpoint, params)
         return(response.text)
 
 
     def fetch_watchlist_markets(self, watchlist_id):
         """Returns the given watchlist's markets"""
         endpoint = '/watchlists/%s' % watchlist_id
-        url = self._url(endpoint)
-        response = self.session.get(url, headers=self.LOGGED_IN_HEADERS)
+        params = {}
+        response = self.session.read(endpoint, params)
         data = self.parse_response(response.text)
         if self.return_dataframe:
             data = pd.DataFrame(data['markets'])
@@ -687,8 +652,7 @@ class IGService:
         }
 
         endpoint = '/watchlists/%s' % watchlist_id
-        url = self._url(endpoint)
-        response = self.session.put(url, data=json.dumps(params), headers=self.LOGGED_IN_HEADERS)
+        response = self.session.update(endpoint)
         data = self.parse_response(response.text)
         return(data)
 
@@ -696,8 +660,7 @@ class IGService:
         """Remove an market from a watchlist"""
         params = {}
         endpoint = '/watchlists/%s/%s' % (watchlist_id, epic)
-        url = self._url(endpoint)
-        response = self.session.post(url, data=json.dumps(params), headers=self.DELETE_HEADERS)
+        response = self.session.delete(endpoint, params)
         return(response.text)
 
     ############ END ############
@@ -710,8 +673,7 @@ class IGService:
         """Log out of the current session"""
         params = {}
         endpoint = '/session'
-        url = self._url(endpoint)
-        self.session.post(url, data=json.dumps(params), headers=self.DELETE_HEADERS)
+        response = self.session.delete(endpoint, params)
 
     def create_session(self):
         """Creates a trading session, obtaining session tokens for subsequent API access"""
@@ -721,9 +683,7 @@ class IGService:
         }
 
         endpoint = '/session'
-        url = self._url(endpoint)
-        response = self.session.post(url, data=json.dumps(params), headers=self.BASIC_HEADERS)
-        self._set_headers(response.headers, True)
+        response = self.session.create(endpoint, params) # first create (BASIC_HEADERS)
         data = self.parse_response(response.text)
         return(data)
 
@@ -735,8 +695,7 @@ class IGService:
         }
 
         endpoint = '/session'
-        url = self._url(endpoint)
-        response = self.session.put(url, data=json.dumps(params), headers=self.LOGGED_IN_HEADERS)
+        response = self.session.update(endpoint)
         self._set_headers(response.headers, False)
         data = self.parse_response(response.text)
         return(data)
@@ -750,10 +709,10 @@ class IGService:
     def get_client_apps(self):
         """Returns a list of client-owned applications"""
         endpoint = '/operations/application'
-        url = self._url(endpoint)
-        response = self.session.get(url, headers=self.LOGGED_IN_HEADERS)
-
-        return self.parse_response(response.text)
+        params = {}
+        response = self.session.read(endpoint, params)
+        data = self.parse_response(response.text)
+        return(data)
 
     def update_client_app(self, allowance_account_overall, allowance_account_trading, api_key, status):
         """Updates an application"""
@@ -765,8 +724,7 @@ class IGService:
         }
 
         endpoint = '/operations/application'
-        url = self._url(endpoint)
-        response = self.session.put(url, data=json.dumps(params), headers=self.LOGGED_IN_HEADERS)
+        response = self.session.update(endpoint)
         data = self.parse_response(response.text)
         return(data)
 
@@ -775,42 +733,8 @@ class IGService:
         Disabled keys may be reenabled via the My Account section on the IG Web Dealing Platform."""
         params = {}
         endpoint = '/operations/application/disable'
-        url = self._url(endpoint)
-        response = self.session.put(url, data=json.dumps(params), headers=self.LOGGED_IN_HEADERS)
+        response = self.session.update(endpoint)
         data = self.parse_response(response.text)
         return(data)
         
-    ############ END ############
-
-
-
-    ########## PRIVATE ##########
-
-    def _set_headers(self, response_headers, update_cst):
-        """Sets headers"""
-        if update_cst == True:
-            self.CLIENT_TOKEN = response_headers['CST']
-
-        try:
-            self.SECURITY_TOKEN = response_headers['X-SECURITY-TOKEN']
-        except:
-            self.SECURITY_TOKEN = None
-
-        self.LOGGED_IN_HEADERS = { 
-            'X-IG-API-KEY': self.API_KEY, 
-            'X-SECURITY-TOKEN': self.SECURITY_TOKEN, 
-            'CST': self.CLIENT_TOKEN, 
-            'Content-Type': 'application/json', 
-            'Accept': 'application/json; charset=UTF-8' 
-        }
-
-        self.DELETE_HEADERS = { 
-            'X-IG-API-KEY': self.API_KEY, 
-            'X-SECURITY-TOKEN': self.SECURITY_TOKEN, 
-            'CST': self.CLIENT_TOKEN, 
-            'Content-Type': 'application/json', 
-            'Accept': 'application/json; charset=UTF-8',
-            '_method': 'DELETE'
-        }
-
     ############ END ############
