@@ -62,11 +62,13 @@ class IG_Session_CRUD(object):
 
     BASE_URL = None
 
+    HEADERS = {}
+
     def __init__(self, base_url, api_key):
         self.BASE_URL = base_url
         self.API_KEY = api_key
 
-        self.BASIC_HEADERS = { 
+        self.HEADERS['BASIC'] = { 
             'X-IG-API-KEY': self.API_KEY,
             'Content-Type': 'application/json', 
             'Accept': 'application/json; charset=UTF-8' 
@@ -83,7 +85,7 @@ class IG_Session_CRUD(object):
     def _create_first(self, endpoint, params):
         """Create first = POST with headers=BASIC_HEADERS"""
         url = self._url(endpoint)
-        response = self.session.post(url, data=json.dumps(params), headers=self.BASIC_HEADERS)
+        response = self.session.post(url, data=json.dumps(params), headers=self.HEADERS['BASIC'])
         self._set_headers(response.headers, True)
         self.create = self._create_logged_in
         return(response)
@@ -91,26 +93,26 @@ class IG_Session_CRUD(object):
     def _create_logged_in(self, endpoint, params):
         """Create when logged in = POST with headers=LOGGED_IN_HEADERS"""
         url = self._url(endpoint)
-        response = self.session.post(url, data=json.dumps(params), headers=self.LOGGED_IN_HEADERS)
+        response = self.session.post(url, data=json.dumps(params), headers=self.HEADERS['LOGGED_IN'])
         return(response)
 
     def read(self, endpoint, params):
         """Read = GET with headers=LOGGED_IN_HEADERS"""
         url = self._url(endpoint)
         #print(url, params)
-        response = self.session.get(url, params=params, headers=self.LOGGED_IN_HEADERS)
+        response = self.session.get(url, params=params, headers=self.HEADERS['LOGGED_IN'])
         return(response)
 
     def update(self, endpoint, params):
         """Update = PUT with headers=LOGGED_IN_HEADERS"""
         url = self._url(endpoint)
-        response = self.session.put(url, data=json.dumps(params), headers=self.LOGGED_IN_HEADERS)
+        response = self.session.put(url, data=json.dumps(params), headers=self.HEADERS['LOGGED_IN'])
         return(response)
 
     def delete(self, endpoint, params):
         """Delete = POST with DELETE_HEADERS"""
         url = self._url(endpoint)
-        response = self.session.post(url, data=json.dumps(params), headers=self.DELETE_HEADERS)
+        response = self.session.post(url, data=json.dumps(params), headers=self.HEADERS['DELETE'])
         return(response)
 
     def _set_headers(self, response_headers, update_cst):
@@ -123,7 +125,7 @@ class IG_Session_CRUD(object):
         except:
             self.SECURITY_TOKEN = None
 
-        self.LOGGED_IN_HEADERS = { 
+        self.HEADERS['LOGGED_IN'] = { 
             'X-IG-API-KEY': self.API_KEY, 
             'X-SECURITY-TOKEN': self.SECURITY_TOKEN, 
             'CST': self.CLIENT_TOKEN, 
@@ -131,7 +133,7 @@ class IG_Session_CRUD(object):
             'Accept': 'application/json; charset=UTF-8' 
         }
 
-        self.DELETE_HEADERS = { 
+        self.HEADERS['DELETE'] = { 
             'X-IG-API-KEY': self.API_KEY, 
             'X-SECURITY-TOKEN': self.SECURITY_TOKEN, 
             'CST': self.CLIENT_TOKEN, 
