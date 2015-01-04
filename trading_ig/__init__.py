@@ -97,7 +97,7 @@ class IG_Session_CRUD(object):
     def read(self, endpoint, params):
         """Read = GET with headers=LOGGED_IN_HEADERS"""
         url = self._url(endpoint)
-        print(url)
+        #print(url, params)
         response = self.session.get(url, params=params, headers=self.LOGGED_IN_HEADERS)
         return(response)
 
@@ -590,9 +590,14 @@ class IGService:
     def fetch_historical_prices_by_epic_and_date_range(self, epic, resolution, start_date, end_date):
         """Returns a list of historical prices for the given epic, resolution, multiplier and date range"""
         # v2
+        #format = "%Y-%m-%d %H:%M:%S"
+        #if isinstance(start_date, datetime.datetime):
+        #    start_date = start_date.strftime(format)
+        #if isinstance(end_date, datetime.datetime):
+        #    end_date = end_date.strftime(format)
         #endpoint = "/prices/{epic}/{resolution}/{startDate}/{endDate}".format(epic=epic, resolution=resolution, startDate=start_date, endDate=end_date)
         #params = {}
-        # https://labs.ig.com/rest-trading-api-reference/service-detail?id=67
+
         # v1
         #date="2014:12:15-00:00:00"
         format = "%Y:%m:%d-%H:%M:%S"
@@ -600,7 +605,6 @@ class IGService:
             start_date = start_date.strftime(format)
         if isinstance(end_date, datetime.datetime):
             end_date = end_date.strftime(format)
-
         endpoint = "/prices/{epic}/{resolution}".format(epic=epic, resolution=resolution)
         params = {
             'startdate': start_date,
