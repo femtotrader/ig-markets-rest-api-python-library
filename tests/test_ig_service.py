@@ -12,6 +12,7 @@ from trading_ig import IGService, ConfigEnvVar
 import pandas as pd
 import pprint
 import os
+import datetime
 
 """
 Environment variables must be set using
@@ -147,12 +148,23 @@ def test_ig_service():
     print("fetch_historical_prices_by_epic_and_num_points")
 
     #epic = 'CS.D.EURUSD.MINI.IP'
-    resolution = 'HOUR'
+    resolution = 'HOUR' # MINUTE, MINUTE_2, MINUTE_3, MINUTE_5, MINUTE_10, MINUTE_15, MINUTE_30, HOUR, HOUR_2, HOUR_3, HOUR_4, DAY, WEEK, MONTH
     num_points = 10
     response = ig_service.fetch_historical_prices_by_epic_and_num_points(epic, resolution, num_points)
     print(response['prices']['price'])
     print(response['prices']['price']['ask'])
     print(response['prices']['volume'])
+    assert(isinstance(response['allowance'], dict))
+    assert(isinstance(response['prices']['volume'], pd.Series))
+    assert(isinstance(response['prices']['price'], pd.Panel))
+
+    print("")
+
+    print("fetch_historical_prices_by_epic_and_date_range")
+    start_date = datetime.datetime(2014, 12, 15)
+    end_date = datetime.datetime(2014, 12, 20)
+    response = ig_service.fetch_historical_prices_by_epic_and_date_range(epic, resolution, start_date, end_date)
+    print(response)
     assert(isinstance(response['allowance'], dict))
     assert(isinstance(response['prices']['volume'], pd.Series))
     assert(isinstance(response['prices']['price'], pd.Panel))
