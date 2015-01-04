@@ -650,9 +650,8 @@ class IGService:
         params = { 
             'epic': epic
         }
-
         endpoint = '/watchlists/%s' % watchlist_id
-        response = self.session.update(endpoint)
+        response = self.session.update(endpoint, params)
         data = self.parse_response(response.text)
         return(data)
 
@@ -681,7 +680,6 @@ class IGService:
             'identifier': self.IG_USERNAME, 
             'password': self.IG_PASSWORD 
         }
-
         endpoint = '/session'
         response = self.session.create(endpoint, params) # first create (BASIC_HEADERS)
         data = self.parse_response(response.text)
@@ -695,7 +693,7 @@ class IGService:
         }
 
         endpoint = '/session'
-        response = self.session.update(endpoint)
+        response = self.session.update(endpoint, params)
         self._set_headers(response.headers, False)
         data = self.parse_response(response.text)
         return(data)
@@ -724,7 +722,7 @@ class IGService:
         }
 
         endpoint = '/operations/application'
-        response = self.session.update(endpoint)
+        response = self.session.update(endpoint, params)
         data = self.parse_response(response.text)
         return(data)
 
@@ -733,7 +731,7 @@ class IGService:
         Disabled keys may be reenabled via the My Account section on the IG Web Dealing Platform."""
         params = {}
         endpoint = '/operations/application/disable'
-        response = self.session.update(endpoint)
+        response = self.session.update(endpoint, params)
         data = self.parse_response(response.text)
         return(data)
         
