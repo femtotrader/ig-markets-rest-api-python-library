@@ -31,16 +31,10 @@ def test_ig_service():
     pp = pprint.PrettyPrinter(indent=4)
 
     config = ConfigEnvVar() # "IG_SERVICE"
-    username = config.get("username")
-    password = config.get("password")
-    api_key = config.get("api_key")
-    acc_type = config.get("acc_type")
-    acc_number = config.get("acc_number")
 
     assert(isinstance(trading_ig.__version__, basestring))
 
-    ig_service = IGService(username, password, api_key, acc_type)
-    #ig_service = IGService(config.username, config.password, config.api_key, config.acc_type)
+    ig_service = IGService(config.username, config.password, config.api_key, config.acc_type)
     ig_service.create_session()
 
     print("fetch_accounts")
