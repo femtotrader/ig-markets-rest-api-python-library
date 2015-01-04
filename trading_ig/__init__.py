@@ -85,12 +85,12 @@ class RequestsSessionWithLog(requests.Session):
         return(response)
 
     def post(self, url, **kwargs):
-        logging.debug("POST request to '%s' with '%s'" % (url, kwargs))
+        #logging.debug("POST request to '%s' with '%s'" % (url, kwargs))
         response = super(RequestsSessionWithLog, self).post(url, **kwargs)
         return(response)
 
     def put(self, url, **kwargs):
-        logging.debug("PUT request to '%s' with '%s'" % (url, kwargs))
+        #logging.debug("PUT request to '%s' with '%s'" % (url, kwargs))
         response = super(RequestsSessionWithLog, self).put(url, **kwargs)
         return(response)
 
