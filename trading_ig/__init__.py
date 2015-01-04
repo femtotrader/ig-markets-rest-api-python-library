@@ -555,9 +555,9 @@ class IGService:
     def format_prices(self, prices):
         """Format prices data as a dict with 
          - 'price' : a Pandas Panel
-                ask, bid, lastTraded as Items axis
+                ask, bid, last as Items axis
                 date as Major_axis axis
-                openPrice highPrice lowPrice closePrice as Minor_axis axis
+                Open High Low Close as Minor_axis axis
          - 'volume' : a timeserie for lastTradedVolume
         """
         df = pd.DataFrame(prices)
@@ -568,7 +568,7 @@ class IGService:
         df_lastTraded = df[[u'openPrice', u'highPrice', u'lowPrice', u'closePrice']].applymap(lambda x: x['lastTraded'])
         ts_lastTradedVolume = df['lastTradedVolume']
         #ts_lastTradedVolume.name = 'Volume'
-        panel = pd.Panel.from_dict({'ask': df_ask, 'bid': df_bid, 'lastTraded': df_lastTraded})
+        panel = pd.Panel.from_dict({'ask': df_ask, 'bid': df_bid, 'last': df_lastTraded})
         panel = panel.rename(minor={'openPrice': 'Open', 'highPrice': 'High', 'lowPrice': 'Low', 'closePrice': 'Close'})
         prices = {}
         prices['price'] = panel

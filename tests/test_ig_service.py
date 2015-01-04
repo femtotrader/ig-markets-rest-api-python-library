@@ -106,13 +106,16 @@ def test_ig_service():
     node = market_id #?
     response = ig_service.fetch_sub_nodes_by_node(node)
     print(response)
+    assert(isinstance(response['markets'], pd.DataFrame))
+    assert(isinstance(response['nodes'], pd.DataFrame))
 
     print("")
 
     print("fetch_all_watchlists")
     response = ig_service.fetch_all_watchlists()
     print(response)
-    watchlist_id = response['id'].iloc[0]
+    assert(isinstance(response, pd.DataFrame))
+    watchlist_id = response['id'].iloc[0] # u'Popular Markets'
     #epic = 
 
     print("")
@@ -120,7 +123,8 @@ def test_ig_service():
     print("fetch_watchlist_markets")
     response = ig_service.fetch_watchlist_markets(watchlist_id)
     print(response)
-    epic = response['epic'].iloc[0] # epic = 'CS.D.EURUSD.MINI.IP'
+    assert(isinstance(response, pd.DataFrame))
+    epic = response['epic'].iloc[0] # epic = 'CS.D.EURUSD.MINI.IP' # u'IX.D.CAC.IDF.IP'
 
     print("")
 
@@ -128,14 +132,15 @@ def test_ig_service():
     response = ig_service.fetch_market_by_epic(epic)
     print(response)
     #pp.pprint(response)
-    #assert(isinstance(response, dict))
+    assert(isinstance(response, dict))
 
     print("")
 
     print("search_markets")
-    search_term = 'UNDEF'
-    response = ig_service.search_markets(epic)
+    search_term = 'EURUSD'
+    response = ig_service.search_markets(search_term)
     print(response)
+    assert(isinstance(response, pd.DataFrame))
 
     print("")
 
@@ -148,4 +153,6 @@ def test_ig_service():
     print(response['prices']['price'])
     print(response['prices']['price']['ask'])
     print(response['prices']['volume'])
+    assert(isinstance(response['allowance'], dict))
+    assert(isinstance(response['prices']['volume'], pd.Series))
     assert(isinstance(response['prices']['price'], pd.Panel))
