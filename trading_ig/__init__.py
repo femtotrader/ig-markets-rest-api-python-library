@@ -111,6 +111,8 @@ class IGService:
 
         #self.create_session()
 
+    def _url(self, endpoint):
+        return(self.BASE_URL + endpoint)
 
     ########## PARSE_RESPONSE ##########
 
@@ -168,7 +170,9 @@ class IGService:
 
     def fetch_accounts(self):
         """Returns a list of accounts belonging to the logged-in client"""
-        response = self.session.get(self.BASE_URL + '/accounts', headers=self.LOGGED_IN_HEADERS)
+        endpoint = '/accounts'
+        url = self._url(endpoint)
+        response = self.session.get(url, headers=self.LOGGED_IN_HEADERS)
         data = self.parse_response(response.text)
         if self.return_dataframe:
             data = pd.DataFrame(data['accounts'])
@@ -186,7 +190,9 @@ class IGService:
 
     def fetch_account_activity_by_period(self, milliseconds):
         """Returns the account activity history for the last specified period"""
-        response = self.session.get(self.BASE_URL + '/history/activity/%s' % milliseconds, headers=self.LOGGED_IN_HEADERS)
+        endpoint = '/history/activity/%s' % milliseconds
+        url = self._url(endpoint)
+        response = self.session.get(url, headers=self.LOGGED_IN_HEADERS)
         data = self.parse_response(response.text)
         if self.return_dataframe:
             data = pd.DataFrame(data['activities'])
@@ -200,7 +206,9 @@ class IGService:
 
     def fetch_transaction_history_by_type_and_period(self, milliseconds, trans_type):
         """Returns the transaction history for the specified transaction type and period"""
-        response = self.session.get(self.BASE_URL + '/history/transactions/%s/%s' % (trans_type, milliseconds), headers=self.LOGGED_IN_HEADERS)
+        endpoint = '/history/transactions/%s/%s' % (trans_type, milliseconds)
+        url = self._url(endpoint)
+        response = self.session.get(url, headers=self.LOGGED_IN_HEADERS)
         data = self.parse_response(response.text)
         if self.return_dataframe:
             data = pd.DataFrame(data['transactions'])
@@ -220,13 +228,17 @@ class IGService:
 
     def fetch_deal_by_deal_reference(self, deal_reference):
         """Returns a deal confirmation for the given deal reference"""
-        response = self.session.get(self.BASE_URL + '/confirms/%s' % deal_reference, headers=self.LOGGED_IN_HEADERS)
+        endpoint = '/confirms/%s' % deal_reference
+        url = self._url(endpoint)
+        response = self.session.get(url, headers=self.LOGGED_IN_HEADERS)
         data = self.parse_response(response.text)
         return(data)
 
     def fetch_open_positions(self):
         """Returns all open positions for the active account"""
-        response = self.session.get(self.BASE_URL  + '/positions', headers=self.LOGGED_IN_HEADERS)
+        endpoint = '/positions'
+        url = self._url(endpoint)
+        response = self.session.get(url, headers=self.LOGGED_IN_HEADERS)
         data = self.parse_response(response.text)
         if self.return_dataframe:
             lst = data['positions']
@@ -258,7 +270,9 @@ class IGService:
             'size': size
         }
 
-        response = requests.post(self.BASE_URL + '/positions/otc', data=json.dumps(params), headers=self.DELETE_HEADERS)
+        endpoint = '/positions/otc'
+        url = self._url(endpoint)
+        response = self.session.post(url, data=json.dumps(params), headers=self.DELETE_HEADERS)
 
         if response.status_code == 200:
             deal_reference = json.loads(response.text)['dealReference']
@@ -287,7 +301,9 @@ class IGService:
             'stopLevel': stop_level
         }
 
-        response = requests.post(self.BASE_URL + '/positions/otc', data=json.dumps(params), headers=self.LOGGED_IN_HEADERS)
+        endpoint = '/positions/otc'
+        url = self._url(endpoint)
+        response = self.session.post(url, data=json.dumps(params), headers=self.LOGGED_IN_HEADERS)
 
         if response.status_code == 200:
             deal_reference = json.loads(response.text)['dealReference']
@@ -302,7 +318,9 @@ class IGService:
             'stopLevel': stop_level
         }
 
-        response = requests.put(self.BASE_URL + '/positions/otc/%s' % deal_id, data=json.dumps(params), headers=self.LOGGED_IN_HEADERS)
+        endpoint = '/positions/otc/%s' % deal_id
+        url = self._url(endpoint)
+        response = self.session.put(url, data=json.dumps(params), headers=self.LOGGED_IN_HEADERS)
 
         if response.status_code == 200:
             deal_reference = json.loads(response.text)['dealReference']
@@ -312,7 +330,9 @@ class IGService:
 
     def fetch_working_orders(self):
         """Returns all open working orders for the active account"""
-        response = self.session.get(self.BASE_URL  + '/workingorders', headers=self.LOGGED_IN_HEADERS)
+        endpoint = '/workingorders'
+        url = self._url(endpoint)
+        response = self.session.get(url, headers=self.LOGGED_IN_HEADERS)
         data = self.parse_response(response.text)
         if self.return_dataframe:
             lst = data['workingOrders']
@@ -357,7 +377,9 @@ class IGService:
             'type': order_type
         }
 
-        response = requests.post(self.BASE_URL + '/workingorders/otc', data=json.dumps(params), headers=self.LOGGED_IN_HEADERS)
+        endpoint = '/workingorders/otc'
+        url = self._url(endpoint)
+        response = self.session.post(url, data=json.dumps(params), headers=self.LOGGED_IN_HEADERS)
 
         if response.status_code == 200:
             deal_reference = json.loads(response.text)['dealReference']
@@ -367,7 +389,10 @@ class IGService:
 
     def delete_working_order(self, deal_id):
         """Deletes an OTC working order"""
-        response = requests.post(self.BASE_URL + '/workingorders/otc/%s' % deal_id, data=json.dumps({}), headers=self.DELETE_HEADERS)
+        params = {}
+        endpoint = '/workingorders/otc/%s' % deal_id
+        url = self._url(endpoint)
+        response = self.session.post(url, data=json.dumps(params), headers=self.DELETE_HEADERS)
 
         if response.status_code == 200:
             deal_reference = json.loads(response.text)['dealReference']
@@ -389,7 +414,9 @@ class IGService:
             'type': order_type
         }
 
-        response = requests.put(self.BASE_URL + '/workingorders/otc/%s' % deal_id, data=json.dumps(params), headers=self.LOGGED_IN_HEADERS)
+        endpoint = '/workingorders/otc/%s' % deal_id
+        url = self._url(endpoint)
+        response = self.session.put(url, data=json.dumps(params), headers=self.LOGGED_IN_HEADERS)
 
         if response.status_code == 200:
             deal_reference = json.loads(response.text)['dealReference']
@@ -405,7 +432,9 @@ class IGService:
 
     def fetch_client_sentiment_by_instrument(self, market_id):
         """Returns the client sentiment for the given instrument's market"""
-        response = self.session.get(self.BASE_URL + '/clientsentiment/%s' % market_id, headers=self.LOGGED_IN_HEADERS)
+        endpoint = '/clientsentiment/%s' % market_id
+        url = self._url(endpoint)
+        response = self.session.get(url, headers=self.LOGGED_IN_HEADERS)
         data = self.parse_response(response.text)
         if self.return_bunch:
             data = bunchify(data)
@@ -413,7 +442,9 @@ class IGService:
 
     def fetch_related_client_sentiment_by_instrument(self, market_id):
         """Returns a list of related (also traded) client sentiment for the given instrument's market"""
-        response = self.session.get(self.BASE_URL + '/clientsentiment/related/%s' % market_id, headers=self.LOGGED_IN_HEADERS)
+        endpoint = '/clientsentiment/related/%s' % market_id
+        url = self._url(endpoint)
+        response = self.session.get(url, headers=self.LOGGED_IN_HEADERS)
         data = self.parse_response(response.text)
         if self.return_dataframe:
             data = pd.DataFrame(data['clientSentiments'])
@@ -421,7 +452,9 @@ class IGService:
 
     def fetch_top_level_navigation_nodes(self):
         """Returns all top-level nodes (market categories) in the market navigation hierarchy."""
-        response = self.session.get(self.BASE_URL + '/marketnavigation', headers=self.LOGGED_IN_HEADERS)
+        endpoint = '/marketnavigation'
+        url = self._url(endpoint)
+        response = self.session.get(url, headers=self.LOGGED_IN_HEADERS)
         data = self.parse_response(response.text)
         if self.return_dataframe:
             data['markets'] = pd.DataFrame(data['markets'])
@@ -438,7 +471,9 @@ class IGService:
 
     def fetch_sub_nodes_by_node(self, node):
         """Returns all sub-nodes of the given node in the market navigation hierarchy"""
-        response = self.session.get(self.BASE_URL + '/marketnavigation/%s' % node, headers=self.LOGGED_IN_HEADERS)
+        endpoint = '/marketnavigation/%s' % node
+        url = self._url(endpoint)
+        response = self.session.get(url, headers=self.LOGGED_IN_HEADERS)
         data = self.parse_response(response.text)
         if self.return_dataframe:
             data['markets'] = pd.DataFrame(data['markets'])
@@ -447,7 +482,9 @@ class IGService:
 
     def fetch_market_by_epic(self, epic):
         """Returns the details of the given market"""
-        response = self.session.get(self.BASE_URL + '/markets/%s' % epic, headers=self.LOGGED_IN_HEADERS)
+        endpoint = '/markets/%s' % epic
+        url = self._url(endpoint)
+        response = self.session.get(url, headers=self.LOGGED_IN_HEADERS)
         data = self.parse_response(response.text)
         if self.return_bunch:
             data = bunchify(data)
@@ -455,7 +492,9 @@ class IGService:
 
     def search_markets(self, search_term):
         """Returns all markets matching the search term"""
-        response = self.session.get(self.BASE_URL + '/markets?searchTerm=%s' % search_term, headers=self.LOGGED_IN_HEADERS)
+        endpoint = '/markets?searchTerm=%s' % search_term
+        url = self._url(endpoint)
+        response = self.session.get(url, headers=self.LOGGED_IN_HEADERS)
         data = self.parse_response(response.text)
         if self.return_dataframe:
             data = pd.DataFrame(data['markets'])
@@ -486,7 +525,9 @@ class IGService:
 
     def fetch_historical_prices_by_epic_and_num_points(self, epic, resolution, num_points):
         """Returns a list of historical prices for the given epic, resolution, number of points"""
-        response = self.session.get(self.BASE_URL + "/prices/{epic}/{resolution}/{numpoints}".format(epic=epic, resolution=resolution, numpoints=num_points), headers=self.LOGGED_IN_HEADERS)
+        endpoint = "/prices/{epic}/{resolution}/{numpoints}".format(epic=epic, resolution=resolution, numpoints=num_points)
+        url = self._url(endpoint)
+        response = self.session.get(url, headers=self.LOGGED_IN_HEADERS)
         data = self.parse_response(response.text)
         if self.return_dataframe:
             data['prices'] = self.format_prices(data['prices'])
@@ -494,7 +535,9 @@ class IGService:
 
     def fetch_historical_prices_by_epic_and_date_range(self, epic, resolution, start_date, end_date):
         """Returns a list of historical prices for the given epic, resolution, multiplier and date range"""
-        response = self.session.get(self.BASE_URL + "/prices/{epic}/{resolution}/?startdate={start_date}&enddate={end_date}".format(epic=epic, resolution=resolution, start_date=start_date, end_date=end_date), headers=self.LOGGED_IN_HEADERS)
+        endpoint = "/prices/{epic}/{resolution}/?startdate={start_date}&enddate={end_date}".format(epic=epic, resolution=resolution, start_date=start_date, end_date=end_date)
+        url = self._url(endpoint)
+        response = self.session.get(url, headers=self.LOGGED_IN_HEADERS)
         data = self.parse_response(response.text)
         if self.return_dataframe:
             data['prices'] = self.format_prices(data['prices'])
@@ -508,7 +551,9 @@ class IGService:
 
     def fetch_all_watchlists(self):
         """Returns all watchlists belonging to the active account"""
-        response = self.session.get(self.BASE_URL + '/watchlists', headers=self.LOGGED_IN_HEADERS)
+        endpoint = '/watchlists'
+        url = self._url(endpoint)
+        response = self.session.get(url, headers=self.LOGGED_IN_HEADERS)
         data = self.parse_response(response.text)
         if self.return_dataframe:
             data = pd.DataFrame(data['watchlists'])
@@ -521,19 +566,26 @@ class IGService:
             'epics': epics
         }
 
-        response = requests.post(self.BASE_URL + '/watchlists', data=json.dumps(params), headers=self.LOGGED_IN_HEADERS)
+        endpoint = '/watchlists'
+        url = self._url(endpoint)
+        response = self.session.post(url, data=json.dumps(params), headers=self.LOGGED_IN_HEADERS)
         data = self.parse_response(response.text)
         return(data)
 
     def delete_watchlist(self, watchlist_id):
         """Deletes a watchlist"""
-        response = requests.post(self.BASE_URL + '/watchlists/%s' % watchlist_id, data=json.dumps({}), headers=self.DELETE_HEADERS)
+        params = {}
+        endpoint = '/watchlists/%s' % watchlist_id
+        url = self._url(endpoint)
+        response = self.session.post(url, data=json.dumps(params), headers=self.DELETE_HEADERS)
         return(response.text)
 
 
     def fetch_watchlist_markets(self, watchlist_id):
         """Returns the given watchlist's markets"""
-        response = self.session.get(self.BASE_URL + '/watchlists/%s' % watchlist_id, headers=self.LOGGED_IN_HEADERS)
+        endpoint = '/watchlists/%s' % watchlist_id
+        url = self._url(endpoint)
+        response = self.session.get(url, headers=self.LOGGED_IN_HEADERS)
         data = self.parse_response(response.text)
         if self.return_dataframe:
             data = pd.DataFrame(data['markets'])
@@ -546,13 +598,18 @@ class IGService:
             'epic': epic
         }
 
-        response = requests.put(self.BASE_URL + '/watchlists/%s' % watchlist_id, data=json.dumps(params), headers=self.LOGGED_IN_HEADERS)
+        endpoint = '/watchlists/%s' % watchlist_id
+        url = self._url(endpoint)
+        response = self.session.put(url, data=json.dumps(params), headers=self.LOGGED_IN_HEADERS)
         data = self.parse_response(response.text)
         return(data)
 
     def remove_market_from_watchlist(self, watchlist_id, epic):
         """Remove an market from a watchlist"""
-        response = requests.post(self.BASE_URL + '/watchlists/%s/%s' % (watchlist_id, epic), data=json.dumps({}), headers=self.DELETE_HEADERS)
+        params = {}
+        endpoint = '/watchlists/%s/%s' % (watchlist_id, epic)
+        url = self._url(endpoint)
+        response = self.session.post(url, data=json.dumps(params), headers=self.DELETE_HEADERS)
         return(response.text)
 
     ############ END ############
@@ -563,7 +620,10 @@ class IGService:
 
     def logout(self):
         """Log out of the current session"""
-        requests.post(self.BASE_URL + '/session', data=json.dumps({}), headers=self.DELETE_HEADERS)
+        params = {}
+        endpoint = '/session'
+        url = self._url(endpoint)
+        self.session.post(url, data=json.dumps(params), headers=self.DELETE_HEADERS)
 
     def create_session(self):
         """Creates a trading session, obtaining session tokens for subsequent API access"""
@@ -572,7 +632,9 @@ class IGService:
             'password': self.IG_PASSWORD 
         }
 
-        response = requests.post(self.BASE_URL  + '/session', data=json.dumps(params), headers=self.BASIC_HEADERS)
+        endpoint = '/session'
+        url = self._url(endpoint)
+        response = self.session.post(url, data=json.dumps(params), headers=self.BASIC_HEADERS)
         self._set_headers(response.headers, True)
         data = self.parse_response(response.text)
         return(data)
@@ -584,7 +646,9 @@ class IGService:
             'defaultAccount': default_account
         }
 
-        response = requests.put(self.BASE_URL + '/session', data=json.dumps(params), headers=self.LOGGED_IN_HEADERS)
+        endpoint = '/session'
+        url = self._url(endpoint)
+        response = self.session.put(url, data=json.dumps(params), headers=self.LOGGED_IN_HEADERS)
         self._set_headers(response.headers, False)
         data = self.parse_response(response.text)
         return(data)
@@ -597,7 +661,9 @@ class IGService:
     
     def get_client_apps(self):
         """Returns a list of client-owned applications"""
-        response = self.session.get(self.BASE_URL + '/operations/application', headers=self.LOGGED_IN_HEADERS)
+        endpoint = '/operations/application'
+        url = self._url(endpoint)
+        response = self.session.get(url, headers=self.LOGGED_IN_HEADERS)
 
         return self.parse_response(response.text)
 
@@ -610,14 +676,19 @@ class IGService:
             'status': status
         }
 
-        response = requests.put(self.BASE_URL + '/operations/application', data=json.dumps(params), headers=self.LOGGED_IN_HEADERS)
+        endpoint = '/operations/application'
+        url = self._url(endpoint)
+        response = self.session.put(url, data=json.dumps(params), headers=self.LOGGED_IN_HEADERS)
         data = self.parse_response(response.text)
         return(data)
 
     def disable_client_app_key(self):
         """Disables the current application key from processing further requests. 
         Disabled keys may be reenabled via the My Account section on the IG Web Dealing Platform."""
-        response = requests.put(self.BASE_URL + '/operations/application/disable', data=json.dumps({}), headers=self.LOGGED_IN_HEADERS)
+        params = {}
+        endpoint = '/operations/application/disable'
+        url = self._url(endpoint)
+        response = self.session.put(url, data=json.dumps(params), headers=self.LOGGED_IN_HEADERS)
         data = self.parse_response(response.text)
         return(data)
         
