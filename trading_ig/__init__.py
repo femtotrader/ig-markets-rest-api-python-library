@@ -52,8 +52,9 @@ class RequestsSessionWithLog(requests.Session):
     """
     Requests Session with log
     """
-    #def __init__(self):
-    #    print("="*100)
+    def __init__(self):
+        #print("="*100)
+        super(RequestsSessionWithLog, self).__init__()
 
     def get(self, url, **kwargs):
         try:
