@@ -74,7 +74,7 @@ class IG_Session_CRUD(object):
             'Accept': 'application/json; charset=UTF-8' 
         }
 
-        self.session = Session()
+        self.session = Session() # requests Session
 
         self.create = self._create_first
         
