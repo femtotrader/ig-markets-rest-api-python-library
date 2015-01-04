@@ -581,6 +581,8 @@ class IGService:
 
 
     def format_prices(self, prices, flag_calc_spread=True):
+        """Format prices data as a DataFrame with hierarchical columns"""
+
         def cols(typ):
             return({
                 'openPrice.%s' % typ: 'Open',
@@ -590,39 +592,21 @@ class IGService:
                 'lastTradedVolume': 'Volume'                
             })
 
-        """Format prices data as a DataFrame with hierarchical columns"""
         df = json_normalize(prices)
         df = df.set_index('snapshotTime')
         df.index.name = 'DateTime'
 
         df_ask = df[['openPrice.ask', 'highPrice.ask', 'lowPrice.ask', 'closePrice.ask']]
-        df_ask = df_ask.rename(columns={
-            'openPrice.ask': 'Open',
-            'highPrice.ask': 'High',
-            'lowPrice.ask': 'Low',
-            'closePrice.ask': 'Close'
-        })
+        df_ask = df_ask.rename(columns=cols('ask'))
 
         df_bid = df[['openPrice.bid', 'highPrice.bid', 'lowPrice.bid', 'closePrice.bid']]
-        df_bid = df_bid.rename(columns={
-            'openPrice.bid': 'Open',
-            'highPrice.bid': 'High',
-            'lowPrice.bid': 'Low',
-            'closePrice.bid': 'Close'
-        })
+        df_bid = df_bid.rename(columns=cols('bid'))
 
         if flag_calc_spread:
             df_spread = df_ask - df_bid
 
         df_last = df[['openPrice.lastTraded', 'highPrice.lastTraded', 'lowPrice.lastTraded', 'closePrice.lastTraded', 'lastTradedVolume']]
         df_last = df_last.rename(columns=cols('lastTraded'))
-        #df_last = df_last.rename(columns={
-        #    'openPrice.lastTraded': 'Open',
-        #    'highPrice.lastTraded': 'High',
-        #    'lowPrice.lastTraded': 'Low',
-        #    'closePrice.lastTraded': 'Close',
-        #    'lastTradedVolume': 'Volume'
-        #})
 
         if not flag_calc_spread:
             df2 = pd.concat([df_bid, df_ask, df_last], axis=1, keys=['bid', 'ask', 'last'])
