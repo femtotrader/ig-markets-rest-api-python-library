@@ -125,7 +125,7 @@ def test_ig_service():
     response = ig_service.fetch_watchlist_markets(watchlist_id)
     print(response)
     assert(isinstance(response, pd.DataFrame))
-    epic = response['epic'].iloc[0] # epic = 'CS.D.EURUSD.MINI.IP' # u'IX.D.CAC.IDF.IP'
+    epic = response['epic'].iloc[0] # epic = 'CS.D.EURUSD.MINI.IP' # epic = u'IX.D.CAC.IDF.IP'
 
     print("")
 
@@ -151,12 +151,14 @@ def test_ig_service():
     resolution = 'HOUR' # MINUTE, MINUTE_2, MINUTE_3, MINUTE_5, MINUTE_10, MINUTE_15, MINUTE_30, HOUR, HOUR_2, HOUR_3, HOUR_4, DAY, WEEK, MONTH
     num_points = 10
     response = ig_service.fetch_historical_prices_by_epic_and_num_points(epic, resolution, num_points)
-    print(response['prices']['price'])
-    print(response['prices']['price']['ask'])
-    print(response['prices']['volume'])
+    print(response)
+    #print(response['prices']['price'])
+    #print(response['prices']['price']['ask'])
+    #print(response['prices']['volume'])
     assert(isinstance(response['allowance'], dict))
-    assert(isinstance(response['prices']['volume'], pd.Series))
-    assert(isinstance(response['prices']['price'], pd.Panel))
+    #assert(isinstance(response['prices']['volume'], pd.Series))
+    #assert(isinstance(response['prices']['price'], pd.Panel))
+    assert(isinstance(response['prices'], pd.DataFrame))
 
     print("")
 
@@ -166,5 +168,6 @@ def test_ig_service():
     response = ig_service.fetch_historical_prices_by_epic_and_date_range(epic, resolution, start_date, end_date)
     print(response)
     assert(isinstance(response['allowance'], dict))
-    assert(isinstance(response['prices']['volume'], pd.Series))
-    assert(isinstance(response['prices']['price'], pd.Panel))
+    #assert(isinstance(response['prices']['volume'], pd.Series))
+    #assert(isinstance(response['prices']['price'], pd.Panel))
+    assert(isinstance(response['prices'], pd.DataFrame))

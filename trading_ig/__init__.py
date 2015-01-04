@@ -15,6 +15,7 @@ import logging
 import traceback
 import os
 import datetime
+from pandas.io.json import json_normalize
 
 from version import __author__, __copyright__, __credits__, \
     __license__, __version__, __maintainer__, __email__, __status__, __url__
@@ -553,7 +554,7 @@ class IGService:
             data = pd.DataFrame(data['markets'])
         return(data)
 
-    def format_prices(self, prices):
+    def format_prices_old(self, prices):
         """Format prices data as a dict with 
          - 'price' : a Pandas Panel
                 ask, bid, last as Items axis
@@ -571,10 +572,53 @@ class IGService:
         #ts_lastTradedVolume.name = 'Volume'
         panel = pd.Panel.from_dict({'ask': df_ask, 'bid': df_bid, 'last': df_lastTraded})
         panel = panel.rename(minor={'openPrice': 'Open', 'highPrice': 'High', 'lowPrice': 'Low', 'closePrice': 'Close'})
+        panel['spread'] = panel['ask'] - panel['bid']
         prices = {}
         prices['price'] = panel
+
         prices['volume'] = ts_lastTradedVolume
         return(prices)
+
+
+    def format_prices(self, prices, flag_calc_spread=True):
+        """Format prices data as a DataFrame with hierarchical columns"""
+        df = json_normalize(prices)
+        df = df.set_index('snapshotTime')
+        df.index.name = 'DateTime'
+
+        df_ask = df[['openPrice.ask', 'highPrice.ask', 'lowPrice.ask', 'closePrice.ask']]
+        df_ask = df_ask.rename(columns={
+            'openPrice.ask': 'Open',
+            'highPrice.ask': 'High',
+            'lowPrice.ask': 'Low',
+            'closePrice.ask': 'Close'
+        })
+
+        df_bid = df[['openPrice.bid', 'highPrice.bid', 'lowPrice.bid', 'closePrice.bid']]
+        df_bid = df_bid.rename(columns={
+            'openPrice.bid': 'Open',
+            'highPrice.bid': 'High',
+            'lowPrice.bid': 'Low',
+            'closePrice.bid': 'Close'
+        })
+
+        if flag_calc_spread:
+            df_spread = df_ask - df_bid
+
+        df_last = df[['openPrice.lastTraded', 'highPrice.lastTraded', 'lowPrice.lastTraded', 'closePrice.lastTraded', 'lastTradedVolume']]
+        df_last = df_last.rename(columns={
+            'openPrice.lastTraded': 'Open',
+            'highPrice.lastTraded': 'High',
+            'lowPrice.lastTraded': 'Low',
+            'closePrice.lastTraded': 'Close',
+            'lastTradedVolume': 'Volume'
+        })
+
+        if not flag_calc_spread:
+            df2 = pd.concat([df_bid, df_ask, df_last], axis=1, keys=['bid', 'ask', 'last'])
+        else:
+            df2 = pd.concat([df_bid, df_ask, df_spread, df_last], axis=1, keys=['bid', 'ask', 'spread', 'last'])
+        return(df2)
 
     def fetch_historical_prices_by_epic_and_num_points(self, epic, resolution, num_points):
         """Returns a list of historical prices for the given epic, resolution, number of points"""
