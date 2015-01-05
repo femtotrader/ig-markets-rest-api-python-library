@@ -16,6 +16,7 @@ import traceback
 import os
 import datetime
 from pandas.io.json import json_normalize
+from pandas.tseries.frequencies import to_offset
 
 from version import __author__, __copyright__, __credits__, \
     __license__, __version__, __maintainer__, __email__, __status__, __url__
@@ -142,6 +143,28 @@ class IG_Session_CRUD(object):
             'Accept': 'application/json; charset=UTF-8',
             '_method': 'DELETE'
         }
+
+def conv_resol(resolution):
+    d = {
+        to_offset('1Min'):'MINUTE',
+        to_offset('2Min'):'MINUTE_2',
+        to_offset('3Min'):'MINUTE_3',
+        to_offset('5Min'):'MINUTE_5',
+        to_offset('10Min'):'MINUTE_10',
+        to_offset('15Min'):'MINUTE_15',
+        to_offset('30Min'): 'MINUTE_30',
+        to_offset('1H'): 'HOUR',
+        to_offset('2H'): 'HOUR_2',
+        to_offset('3H'): 'HOUR_3',
+        to_offset('4H'): 'HOUR_4',
+        to_offset('D'): 'DAY',
+        to_offset('W'): 'WEEK',
+        to_offset('M'): 'MONTH'
+    }
+    try:
+        return(d[to_offset(resolution)])
+    except:
+        return(resolution)
 
 class IGService:
 
@@ -616,6 +639,7 @@ class IGService:
 
     def fetch_historical_prices_by_epic_and_num_points(self, epic, resolution, num_points):
         """Returns a list of historical prices for the given epic, resolution, number of points"""
+        resolution = conv_resol(resolution)
         params = {}
         endpoint = "/prices/{epic}/{resolution}/{numpoints}".format(epic=epic, resolution=resolution, numpoints=num_points)
         response = self.session.read(endpoint, params)
@@ -626,6 +650,7 @@ class IGService:
 
     def fetch_historical_prices_by_epic_and_date_range(self, epic, resolution, start_date, end_date):
         """Returns a list of historical prices for the given epic, resolution, multiplier and date range"""
+        resolution = conv_resol(resolution)
         # v2
         #format = "%Y-%m-%d %H:%M:%S"
         #if isinstance(start_date, datetime.datetime):

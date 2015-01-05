@@ -148,7 +148,8 @@ def test_ig_service():
     print("fetch_historical_prices_by_epic_and_num_points")
 
     #epic = 'CS.D.EURUSD.MINI.IP'
-    resolution = 'HOUR' # MINUTE, MINUTE_2, MINUTE_3, MINUTE_5, MINUTE_10, MINUTE_15, MINUTE_30, HOUR, HOUR_2, HOUR_3, HOUR_4, DAY, WEEK, MONTH
+    #resolution = 'HOUR' # MINUTE, MINUTE_2, MINUTE_3, MINUTE_5, MINUTE_10, MINUTE_15, MINUTE_30, HOUR, HOUR_2, HOUR_3, HOUR_4, DAY, WEEK, MONTH
+    resolution = 'H' # http://pandas.pydata.org/pandas-docs/stable/timeseries.html#dateoffset-objects
     num_points = 10
     response = ig_service.fetch_historical_prices_by_epic_and_num_points(epic, resolution, num_points)
     print(response)
