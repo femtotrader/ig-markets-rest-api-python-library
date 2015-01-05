@@ -33,7 +33,7 @@ epic = 'CS.D.EURUSD.MINI.IP'
 resolution = 'DAY'
 num_points = 10
 response = ig_service.fetch_historical_prices_by_epic_and_num_points(epic, resolution, num_points)
-df_ask = response['prices']['price']['ask']
+df_ask = response['prices']['ask']
 print("ask prices:\n%s" % df_ask)
 
 #print(trading_ig.__version__)

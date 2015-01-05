@@ -166,6 +166,10 @@ def conv_resol(resolution):
     except:
         return(resolution)
 
+def conv_datetime_v1(dt):
+    format = "%Y:%m:%d-%H:%M:%S"
+    return(dt.strftime(format))
+
 class IGService:
 
     D_BASE_URL = {
@@ -662,11 +666,10 @@ class IGService:
 
         # v1
         #date="2014:12:15-00:00:00"
-        format = "%Y:%m:%d-%H:%M:%S"
         if isinstance(start_date, datetime.datetime):
-            start_date = start_date.strftime(format)
+            start_date = conv_datetime_v1(start_date)
         if isinstance(end_date, datetime.datetime):
-            end_date = end_date.strftime(format)
+            end_date = conv_datetime_v1(end_date)
         endpoint = "/prices/{epic}/{resolution}".format(epic=epic, resolution=resolution)
         params = {
             'startdate': start_date,

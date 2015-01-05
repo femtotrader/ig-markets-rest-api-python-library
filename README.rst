@@ -76,7 +76,7 @@ instance of the IGService class.
     resolution = 'DAY'
     num_points = 10
     response = ig_service.fetch_historical_prices_by_epic_and_num_points(epic, resolution, num_points)
-    df_ask = response['prices']['price']['ask']
+    df_ask = response['prices']['ask']
     print("ask prices:\n%s" % df_ask)
 
 with ``trading_ig_config.py``
