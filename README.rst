@@ -132,3 +132,24 @@ it should display:
 
 Many IGService methods return `Python
 Pandas <http://pandas.pydata.org/>`__ DataFrame, Series or Panel.
+
+Install
+-------
+
+From Python package index
+~~~~~~~~~~~~~~~~~~~~~~~~~
+
+..
+
+    $ pip inst
+
+From source
+~~~~~~~~~~~
+
+Get latest version using Git
+
+..
+
+    $ git clone https://github.com/femtotrader/ig-markets-rest-api-python-library.git
+    $ cd ig-markets-rest-api-python-library
+    $ python setup.py install
