@@ -7,8 +7,9 @@ nosetests -s -v
 """
 
 import trading_ig
-from trading_ig import IGService, ConfigEnvVar
-#from trading_ig_config import * # defines username, password, api_key, acc_type, acc_number
+from trading_ig import IGService
+from trading_ig import ConfigEnvVar
+#from trading_ig_config import config # defines username, password, api_key, acc_type, acc_number
 import pandas as pd
 import pprint
 import os
