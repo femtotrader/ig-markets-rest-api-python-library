@@ -141,7 +141,7 @@ From Python package index
 
 ..
 
-    $ pip inst
+    $ pip install trading_ig
 
 From source
 ~~~~~~~~~~~
