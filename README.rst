@@ -139,7 +139,7 @@ Install
 From Python package index
 ~~~~~~~~~~~~~~~~~~~~~~~~~
 
-..
+::
 
     $ pip install trading_ig
 
@@ -148,7 +148,7 @@ From source
 
 Get latest version using Git
 
-..
+::
 
     $ git clone https://github.com/femtotrader/ig-markets-rest-api-python-library.git
     $ cd ig-markets-rest-api-python-library
