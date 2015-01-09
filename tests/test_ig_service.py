@@ -32,10 +32,9 @@ export IG_SERVICE_ACC_NUMBER=""
 def test_ig_service():
     pp = pprint.PrettyPrinter(indent=4)
 
-    config = ConfigEnvVar() # "IG_SERVICE"
-
     assert(isinstance(trading_ig.__version__, basestring))
 
+    config = ConfigEnvVar() # "IG_SERVICE"
     ig_service = IGService(config.username, config.password, config.api_key, config.acc_type)
     ig_service.create_session()
 
