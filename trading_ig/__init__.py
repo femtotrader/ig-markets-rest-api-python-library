@@ -6,6 +6,7 @@ IG Markets REST API Library for Python
 http://labs.ig.com/rest-trading-api-reference
 By Lewis Barber - 2014 - http://uk.linkedin.com/in/lewisbarber/
 Modified by Femto Trader - 2014-2015
+
 """
 
 import requests
