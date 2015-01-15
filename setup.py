@@ -13,7 +13,7 @@ here = path.abspath(path.dirname(__file__))
 
 def readme():
     filename = path.join(here, 'README.rst')
-    with open(filename) as f:
+    with io.open(filename, 'rt', encoding='UTF-8') as f:
         return f.read()
 
 setup(
