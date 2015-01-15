@@ -4,9 +4,11 @@
 from setuptools import setup, find_packages  # Always prefer setuptools over distutils
 from codecs import open  # To use a consistent encoding
 from os import path
+import io
 
 NAME = 'trading_ig'
-with open("%s/version.py" % NAME) as f:
+filename = "%s/version.py" % NAME
+with io.open(filename, 'rt', encoding='UTF-8') as f:
     exec(f.read())
 
 here = path.abspath(path.dirname(__file__))
