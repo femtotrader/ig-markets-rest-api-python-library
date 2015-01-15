@@ -8,7 +8,7 @@ import io
 
 NAME = 'trading_ig'
 filename = "%s/version.py" % NAME
-with io.open(filename, 'rt', encoding='UTF-8') as f:
+with open(filename) as f:
     exec(f.read())
 
 here = path.abspath(path.dirname(__file__))
