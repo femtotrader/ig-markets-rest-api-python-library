@@ -198,10 +198,7 @@ class IGService:
         self.return_dataframe = _HAS_PANDAS
         self.return_bunch = _HAS_BUNCH
 
-        self.session = IG_Session_CRUD(self.BASE_URL, self.API_KEY)
-
-        #self.create_session()
-
+        self.crud_session = IG_Session_CRUD(self.BASE_URL, self.API_KEY)
 
     ########## PARSE_RESPONSE ##########
 
@@ -261,7 +258,7 @@ class IGService:
         """Returns a list of accounts belonging to the logged-in client"""
         params = {}
         endpoint = '/accounts'
-        response = self.session.read(endpoint, params)
+        response = self.crud_session.read(endpoint, params)
         data = self.parse_response(response.text)
         if self.return_dataframe:
             data = pd.DataFrame(data['accounts'])
@@ -281,7 +278,7 @@ class IGService:
         """Returns the account activity history for the last specified period"""
         params = {}
         endpoint = '/history/activity/%s' % milliseconds
-        response = self.session.read(endpoint, params)
+        response = self.crud_session.read(endpoint, params)
         data = self.parse_response(response.text)
         if self.return_dataframe:
             data = pd.DataFrame(data['activities'])
@@ -297,7 +294,7 @@ class IGService:
         """Returns the transaction history for the specified transaction type and period"""
         params = {}
         endpoint = '/history/transactions/%s/%s' % (trans_type, milliseconds)
-        response = self.session.read(endpoint, params)
+        response = self.crud_session.read(endpoint, params)
         data = self.parse_response(response.text)
         if self.return_dataframe:
             data = pd.DataFrame(data['transactions'])
@@ -319,7 +316,7 @@ class IGService:
         """Returns a deal confirmation for the given deal reference"""
         params = {}
         endpoint = '/confirms/%s' % deal_reference
-        response = self.session.read(endpoint, params)
+        response = self.crud_session.read(endpoint, params)
         data = self.parse_response(response.text)
         return(data)
 
@@ -327,7 +324,7 @@ class IGService:
         """Returns all open positions for the active account"""
         params = {}
         endpoint = '/positions'
-        response = self.session.read(endpoint, params)
+        response = self.crud_session.read(endpoint, params)
         data = self.parse_response(response.text)
         if self.return_dataframe:
             lst = data['positions']
@@ -359,7 +356,7 @@ class IGService:
             'size': size
         }
         endpoint = '/positions/otc'
-        response = self.session.delete(endpoint, params)
+        response = self.crud_session.delete(endpoint, params)
 
         if response.status_code == 200:
             deal_reference = json.loads(response.text)['dealReference']
@@ -389,7 +386,7 @@ class IGService:
         }
 
         endpoint = '/positions/otc'
-        response = self.session.create(endpoint, params)
+        response = self.crud_session.create(endpoint, params)
 
         if response.status_code == 200:
             deal_reference = json.loads(response.text)['dealReference']
@@ -405,7 +402,7 @@ class IGService:
         }
 
         endpoint = '/positions/otc/%s' % deal_id
-        response = self.session.update(endpoint)
+        response = self.crud_session.update(endpoint)
 
         if response.status_code == 200:
             deal_reference = json.loads(response.text)['dealReference']
@@ -417,7 +414,7 @@ class IGService:
         """Returns all open working orders for the active account"""
         params = {}
         endpoint = '/workingorders'
-        response = self.session.read(endpoint, params)
+        response = self.crud_session.read(endpoint, params)
         data = self.parse_response(response.text)
         if self.return_dataframe:
             lst = data['workingOrders']
@@ -462,7 +459,7 @@ class IGService:
             'type': order_type
         }
         endpoint = '/workingorders/otc'
-        response = self.session.create(endpoint, params)
+        response = self.crud_session.create(endpoint, params)
 
         if response.status_code == 200:
             deal_reference = json.loads(response.text)['dealReference']
@@ -474,7 +471,7 @@ class IGService:
         """Deletes an OTC working order"""
         params = {}
         endpoint = '/workingorders/otc/%s' % deal_id
-        response = self.session.delete(endpoint, params)
+        response = self.crud_session.delete(endpoint, params)
 
         if response.status_code == 200:
             deal_reference = json.loads(response.text)['dealReference']
@@ -496,7 +493,7 @@ class IGService:
             'type': order_type
         }
         endpoint = '/workingorders/otc/%s' % deal_id
-        response = self.session.update(endpoint)
+        response = self.crud_session.update(endpoint)
 
         if response.status_code == 200:
             deal_reference = json.loads(response.text)['dealReference']
@@ -514,7 +511,7 @@ class IGService:
         """Returns the client sentiment for the given instrument's market"""
         params = {}
         endpoint = '/clientsentiment/%s' % market_id
-        response = self.session.read(endpoint, params)
+        response = self.crud_session.read(endpoint, params)
         data = self.parse_response(response.text)
         if self.return_bunch:
             data = bunchify(data)
@@ -524,7 +521,7 @@ class IGService:
         """Returns a list of related (also traded) client sentiment for the given instrument's market"""
         params = {}
         endpoint = '/clientsentiment/related/%s' % market_id
-        response = self.session.read(endpoint, params)
+        response = self.crud_session.read(endpoint, params)
         data = self.parse_response(response.text)
         if self.return_dataframe:
             data = pd.DataFrame(data['clientSentiments'])
@@ -534,7 +531,7 @@ class IGService:
         """Returns all top-level nodes (market categories) in the market navigation hierarchy."""
         params = {}
         endpoint = '/marketnavigation'
-        response = self.session.read(endpoint, params)
+        response = self.crud_session.read(endpoint, params)
         data = self.parse_response(response.text)
         if self.return_dataframe:
             data['markets'] = pd.DataFrame(data['markets'])
@@ -553,7 +550,7 @@ class IGService:
         """Returns all sub-nodes of the given node in the market navigation hierarchy"""
         params = {}
         endpoint = '/marketnavigation/%s' % node
-        response = self.session.read(endpoint, params)
+        response = self.crud_session.read(endpoint, params)
         data = self.parse_response(response.text)
         if self.return_dataframe:
             data['markets'] = pd.DataFrame(data['markets'])
@@ -564,7 +561,7 @@ class IGService:
         """Returns the details of the given market"""
         params = {}
         endpoint = '/markets/%s' % epic
-        response = self.session.read(endpoint, params)
+        response = self.crud_session.read(endpoint, params)
         data = self.parse_response(response.text)
         if self.return_bunch:
             data = bunchify(data)
@@ -576,7 +573,7 @@ class IGService:
         params = {
             'searchTerm': search_term
         }
-        response = self.session.read(endpoint, params)
+        response = self.crud_session.read(endpoint, params)
         data = self.parse_response(response.text)
         if self.return_dataframe:
             data = pd.DataFrame(data['markets'])
@@ -647,7 +644,7 @@ class IGService:
         resolution = conv_resol(resolution)
         params = {}
         endpoint = "/prices/{epic}/{resolution}/{numpoints}".format(epic=epic, resolution=resolution, numpoints=num_points)
-        response = self.session.read(endpoint, params)
+        response = self.crud_session.read(endpoint, params)
         data = self.parse_response(response.text)
         if self.return_dataframe:
             data['prices'] = self.format_prices(data['prices'])
@@ -676,7 +673,7 @@ class IGService:
             'startdate': start_date,
             'enddate': end_date
         }
-        response = self.session.read(endpoint, params)
+        response = self.crud_session.read(endpoint, params)
         data = self.parse_response(response.text)
         if self.return_dataframe:
             data['prices'] = self.format_prices(data['prices'])
@@ -692,7 +689,7 @@ class IGService:
         """Returns all watchlists belonging to the active account"""
         params = {}
         endpoint = '/watchlists'
-        response = self.session.read(endpoint, params)
+        response = self.crud_session.read(endpoint, params)
         data = self.parse_response(response.text)
         if self.return_dataframe:
             data = pd.DataFrame(data['watchlists'])
@@ -705,7 +702,7 @@ class IGService:
             'epics': epics
         }
         endpoint = '/watchlists'
-        response = self.session.create(endpoint, params)
+        response = self.crud_session.create(endpoint, params)
         data = self.parse_response(response.text)
         return(data)
 
@@ -713,7 +710,7 @@ class IGService:
         """Deletes a watchlist"""
         params = {}
         endpoint = '/watchlists/%s' % watchlist_id
-        response = self.session.delete(endpoint, params)
+        response = self.crud_session.delete(endpoint, params)
         return(response.text)
 
 
@@ -721,7 +718,7 @@ class IGService:
         """Returns the given watchlist's markets"""
         params = {}
         endpoint = '/watchlists/%s' % watchlist_id
-        response = self.session.read(endpoint, params)
+        response = self.crud_session.read(endpoint, params)
         data = self.parse_response(response.text)
         if self.return_dataframe:
             data = pd.DataFrame(data['markets'])
@@ -734,7 +731,7 @@ class IGService:
             'epic': epic
         }
         endpoint = '/watchlists/%s' % watchlist_id
-        response = self.session.update(endpoint, params)
+        response = self.crud_session.update(endpoint, params)
         data = self.parse_response(response.text)
         return(data)
 
@@ -742,7 +739,7 @@ class IGService:
         """Remove an market from a watchlist"""
         params = {}
         endpoint = '/watchlists/%s/%s' % (watchlist_id, epic)
-        response = self.session.delete(endpoint, params)
+        response = self.crud_session.delete(endpoint, params)
         return(response.text)
 
     ############ END ############
@@ -755,7 +752,7 @@ class IGService:
         """Log out of the current session"""
         params = {}
         endpoint = '/session'
-        response = self.session.delete(endpoint, params)
+        response = self.crud_session.delete(endpoint, params)
 
     def create_session(self):
         """Creates a trading session, obtaining session tokens for subsequent API access"""
@@ -764,7 +761,7 @@ class IGService:
             'password': self.IG_PASSWORD 
         }
         endpoint = '/session'
-        response = self.session.create(endpoint, params) # first create (BASIC_HEADERS)
+        response = self.crud_session.create(endpoint, params) # first create (BASIC_HEADERS)
         data = self.parse_response(response.text)
         return(data)
 
@@ -775,7 +772,7 @@ class IGService:
             'defaultAccount': default_account
         }
         endpoint = '/session'
-        response = self.session.update(endpoint, params)
+        response = self.crud_session.update(endpoint, params)
         self._set_headers(response.headers, False)
         data = self.parse_response(response.text)
         return(data)
@@ -790,7 +787,7 @@ class IGService:
         """Returns a list of client-owned applications"""
         params = {}
         endpoint = '/operations/application'
-        response = self.session.read(endpoint, params)
+        response = self.crud_session.read(endpoint, params)
         data = self.parse_response(response.text)
         return(data)
 
@@ -803,7 +800,7 @@ class IGService:
             'status': status
         }
         endpoint = '/operations/application'
-        response = self.session.update(endpoint, params)
+        response = self.crud_session.update(endpoint, params)
         data = self.parse_response(response.text)
         return(data)
 
@@ -812,7 +809,7 @@ class IGService:
         Disabled keys may be reenabled via the My Account section on the IG Web Dealing Platform."""
         params = {}
         endpoint = '/operations/application/disable'
-        response = self.session.update(endpoint, params)
+        response = self.crud_session.update(endpoint, params)
         data = self.parse_response(response.text)
         return(data)
         
