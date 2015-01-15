@@ -64,7 +64,7 @@ instance of the IGService class.
     ig_service = IGService(config.username, config.password, config.api_key, config.acc_type)
     ig_service.create_session()
 
-    account_info = ig_service.switch_account(config.acc_number, False)
+    account_info = ig_service.switch_account(config.acc_number, False) # not necessary
     print(account_info)
 
     open_positions = ig_service.fetch_open_positions()
@@ -156,8 +156,8 @@ or just for a given method (like fetching prices)
 
     epic = 'CS.D.EURUSD.MINI.IP'
     resolution = 'D'
-    start_date = datetime.datetime(2014, 12, 15)
-    end_date = datetime.datetime(2014, 12, 20)
+    start_date = '2014-12-15'
+    end_date = '2014-12-20'
     response = ig_service.fetch_historical_prices_by_epic_and_date_range(epic, resolution, start_date, end_date, session)
     
 

@@ -18,6 +18,7 @@ import os
 import datetime
 from pandas.io.json import json_normalize
 from pandas.tseries.frequencies import to_offset
+import six
 
 from version import __author__, __copyright__, __credits__, \
     __license__, __version__, __maintainer__, __email__, __status__, __url__
@@ -180,11 +181,41 @@ def conv_resol(resolution):
     try:
         return(d[to_offset(resolution)])
     except:
+        logging.error(traceback.format_exc())
+        logging.warning("conv_resol returns '%s'" % resolution)
         return(resolution)
 
-def conv_datetime_v1(dt):
-    format = "%Y:%m:%d-%H:%M:%S"
-    return(dt.strftime(format))
+def conv_datetime(dt, version=1):
+    """Converts dt to string like
+    version 1 = 2014:12:15-00:00:00
+    version 2 = 2014-12-15-00:00:00
+    """
+    try:
+        if isinstance(dt, six.string_types):
+            dt = pd.to_datetime(dt)
+    
+        d_formats = {
+            1: "%Y:%m:%d-%H:%M:%S",
+            2: "%Y-%m-%d %H:%M:%S"
+        }
+        format = d_formats[version]
+        return(dt.strftime(format))
+    except:
+        logging.error(traceback.format_exc())
+        logging.warning("conv_datetime returns '%s'" % dt)
+        return(dt)
+
+def conv_to_ms(td):
+    """Converts td to integer number of milliseconds"""
+    try:
+        if isinstance(td, six.integer_types):
+            return(td)
+        else:
+            return(int(td.total_seconds()*1000.0))
+    except:
+        logging.error(traceback.format_exc())
+        logging.warning("conv_to_ms returns '%s'" % td)
+        return(td)
 
 class IGService:
 
@@ -478,6 +509,9 @@ class IGService:
         guaranteed_stop, level, limit_distance, limit_level, size, stop_distance, stop_level,
         time_in_force, order_type, session = None):
         """Creates an OTC working order"""
+
+        good_till_date = conv_datetime(good_till_date, 1)
+
         params = { 
             'currencyCode': currency_code, 
             'direction': direction, 
@@ -699,21 +733,16 @@ class IGService:
     def fetch_historical_prices_by_epic_and_date_range(self, epic, resolution, start_date, end_date, session = None):
         """Returns a list of historical prices for the given epic, resolution, multiplier and date range"""
         resolution = conv_resol(resolution)
+        
         # v2
-        #format = "%Y-%m-%d %H:%M:%S"
-        #if isinstance(start_date, datetime.datetime):
-        #    start_date = start_date.strftime(format)
-        #if isinstance(end_date, datetime.datetime):
-        #    end_date = end_date.strftime(format)
+        start_date = conv_datetime(start_date, 2)
+        end_date = conv_datetime(end_date, 2)
         #endpoint = "/prices/{epic}/{resolution}/{startDate}/{endDate}".format(epic=epic, resolution=resolution, startDate=start_date, endDate=end_date)
         #params = {}
 
         # v1
-        #date="2014:12:15-00:00:00"
-        if isinstance(start_date, datetime.datetime):
-            start_date = conv_datetime_v1(start_date)
-        if isinstance(end_date, datetime.datetime):
-            end_date = conv_datetime_v1(end_date)
+        start_date = conv_datetime(start_date, 1)
+        end_date = conv_datetime(end_date, 1)
         endpoint = "/prices/{epic}/{resolution}".format(epic=epic, resolution=resolution)
         params = {
             'startdate': start_date,
