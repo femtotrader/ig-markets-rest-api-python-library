@@ -73,7 +73,7 @@ instance of the IGService class.
     print("")
 
     epic = 'CS.D.EURUSD.MINI.IP'
-    resolution = 'DAY'
+    resolution = 'D'
     num_points = 10
     response = ig_service.fetch_historical_prices_by_epic_and_num_points(epic, resolution, num_points)
     df_ask = response['prices']['ask']
@@ -132,6 +132,34 @@ it should display:
 
 Many IGService methods return `Python
 Pandas <http://pandas.pydata.org/>`__ DataFrame, Series or Panel.
+
+Cache queries requests-cache
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Set CachedSession using:
+
+.. code:: python
+
+    import requests_cache
+    session = requests_cache.CachedSession(cache_name='cache', backend='sqlite', expire_after=60*60)
+
+CachedSession can be applied globally on IGService
+
+.. code:: python
+
+    ig_service = IGService(config.username, config.password, config.api_key, config.acc_type, session)
+    ig_service.create_session()
+
+or just for a given method (like fetching prices)
+
+.. code:: python
+
+    epic = 'CS.D.EURUSD.MINI.IP'
+    resolution = 'D'
+    start_date = datetime.datetime(2014, 12, 15)
+    end_date = datetime.datetime(2014, 12, 20)
+    response = ig_service.fetch_historical_prices_by_epic_and_date_range(epic, resolution, start_date, end_date, session)
+    
 
 Install
 -------
