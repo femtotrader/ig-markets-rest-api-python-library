@@ -15,6 +15,7 @@ import pprint
 import os
 import datetime
 #from datetime import datetime, timedelta
+import six
 
 """
 Environment variables must be set using
@@ -33,7 +34,7 @@ export IG_SERVICE_ACC_NUMBER=""
 def test_ig_service():
     pp = pprint.PrettyPrinter(indent=4)
 
-    assert(isinstance(trading_ig.__version__, basestring))
+    assert(isinstance(trading_ig.__version__, six.string_types))
 
     config = ConfigEnvVar("IG_SERVICE")
     ig_service = IGService(config.username, config.password, config.api_key, config.acc_type)
