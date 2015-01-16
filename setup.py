@@ -7,7 +7,7 @@ from os import path
 import io
 
 NAME = 'trading_ig'
-filename = "%s/version.py" % NAME
+filename = "%s/version/__init__.py" % NAME
 with open(filename) as f:
     exec(f.read())
 
