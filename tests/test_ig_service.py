@@ -8,7 +8,7 @@ nosetests -s -v
 
 import trading_ig
 from trading_ig import IGService
-from trading_ig import ConfigEnvVar
+from trading_ig.config import ConfigEnvVar
 #from trading_ig_config import config # defines username, password, api_key, acc_type, acc_number
 import pandas as pd
 import pprint
@@ -35,7 +35,7 @@ def test_ig_service():
 
     assert(isinstance(trading_ig.__version__, basestring))
 
-    config = ConfigEnvVar() # "IG_SERVICE"
+    config = ConfigEnvVar("IG_SERVICE")
     ig_service = IGService(config.username, config.password, config.api_key, config.acc_type)
     ig_service.create_session()
 
