@@ -83,7 +83,7 @@ class IG_Session_CRUD(object):
 
         self.create = self._create_first
 
-    def get_session(self, session):
+    def _get_session(self, session):
         """Returns a Requests session if session is None
         or session if it's not None (cached session with requests-cache for example)"""
         if session is None:
@@ -99,7 +99,7 @@ class IG_Session_CRUD(object):
     def _create_first(self, endpoint, params, session):
         """Create first = POST with headers=BASIC_HEADERS"""
         url = self._url(endpoint)
-        session = self.get_session(session)
+        session = self._get_session(session)
         response = session.post(url, data=json.dumps(params), headers=self.HEADERS['BASIC'])
         self._set_headers(response.headers, True)
         self.create = self._create_logged_in
@@ -108,7 +108,7 @@ class IG_Session_CRUD(object):
     def _create_logged_in(self, endpoint, params, session):
         """Create when logged in = POST with headers=LOGGED_IN_HEADERS"""
         url = self._url(endpoint)
-        session = self.get_session(session)
+        session = self._get_session(session)
         response = session.post(url, data=json.dumps(params), headers=self.HEADERS['LOGGED_IN'])
         return(response)
 
@@ -116,21 +116,21 @@ class IG_Session_CRUD(object):
         """Read = GET with headers=LOGGED_IN_HEADERS"""
         url = self._url(endpoint)
         #print(url, params)
-        session = self.get_session(session)
+        session = self._get_session(session)
         response = session.get(url, params=params, headers=self.HEADERS['LOGGED_IN'])
         return(response)
 
     def update(self, endpoint, params, session):
         """Update = PUT with headers=LOGGED_IN_HEADERS"""
         url = self._url(endpoint)
-        session = self.get_session(session)
+        session = self._get_session(session)
         response = session.put(url, data=json.dumps(params), headers=self.HEADERS['LOGGED_IN'])
         return(response)
 
     def delete(self, endpoint, params, session):
         """Delete = POST with DELETE_HEADERS"""
         url = self._url(endpoint)
-        session = self.get_session(session)
+        session = self._get_session(session)
         response = session.post(url, data=json.dumps(params), headers=self.HEADERS['DELETE'])
         return(response)
 
@@ -259,14 +259,20 @@ class IGService:
 
         self.crud_session = IG_Session_CRUD(self.BASE_URL, self.API_KEY, self.session)
 
-    def get_session(self, session):
-        """Returns a Requests session if session is None
+    def _get_session(self, session):
+        """Returns a Requests session (from self.session) if session is None
         or session if it's not None (cached session with requests-cache for example)"""
         if session is None:
             session = self.session # requests Session
         else:
             session = session
         return(session)
+
+    def _req(self, action, endpoint, params, session):
+        """Creates a CRUD request and returns response"""
+        session = self._get_session(session)
+        response = self.crud_session.req(action, endpoint, params, session)        
+        return(response)
 
     ########## PARSE_RESPONSE ##########
 
@@ -327,8 +333,7 @@ class IGService:
         params = {}
         endpoint = '/accounts'
         action = 'read'
-        session = self.get_session(session)
-        response = self.crud_session.req(action, endpoint, params, session)
+        response = self._req(action, endpoint, params, session)
         data = self.parse_response(response.text)
         if self.return_dataframe:
             data = pd.DataFrame(data['accounts'])
@@ -348,10 +353,12 @@ class IGService:
         """Returns the account activity history for the last specified period"""
         milliseconds = conv_to_ms(milliseconds)
         params = {}
-        endpoint = '/history/activity/%s' % milliseconds
+        url_params = {
+            'milliseconds': milliseconds
+        }
+        endpoint = '/history/activity/{milliseconds}'.format(**url_params)
         action = 'read'
-        session = self.get_session(session)
-        response = self.crud_session.req(action, endpoint, params, session)
+        response = self._req(action, endpoint, params, session)
         data = self.parse_response(response.text)
         if self.return_dataframe:
             data = pd.DataFrame(data['activities'])
@@ -367,10 +374,13 @@ class IGService:
         """Returns the transaction history for the specified transaction type and period"""
         milliseconds = conv_to_ms(milliseconds)
         params = {}
-        endpoint = '/history/transactions/%s/%s' % (trans_type, milliseconds)
+        url_params = {
+            'milliseconds': milliseconds,
+            'trans_type': trans_type
+        }
+        endpoint = '/history/transactions/{trans_type}/{milliseconds}'.format(**url_params)
         action = 'read'
-        session = self.get_session(session)
-        response = self.crud_session.req(action, endpoint, params, session)
+        response = self._req(action, endpoint, params, session)
         data = self.parse_response(response.text)
         if self.return_dataframe:
             data = pd.DataFrame(data['transactions'])
@@ -391,10 +401,12 @@ class IGService:
     def fetch_deal_by_deal_reference(self, deal_reference, session = None):
         """Returns a deal confirmation for the given deal reference"""
         params = {}
-        endpoint = '/confirms/%s' % deal_reference
+        url_params = {
+            'deal_reference': deal_reference
+        }
+        endpoint = '/confirms/{deal_reference}'.format(**url_params)
         action = 'read'
-        session = self.get_session(session)
-        response = self.crud_session.req(action, endpoint, params, session)
+        response = self._req(action, endpoint, params, session)
         data = self.parse_response(response.text)
         return(data)
 
@@ -403,8 +415,7 @@ class IGService:
         params = {}
         endpoint = '/positions'
         action = 'read'
-        session = self.get_session(session)
-        response = self.crud_session.req(action, endpoint, params, session)
+        response = self._req(action, endpoint, params, session)
         data = self.parse_response(response.text)
         if self.return_dataframe:
             lst = data['positions']
@@ -437,8 +448,7 @@ class IGService:
         }
         endpoint = '/positions/otc'
         action = 'delete'
-        session = self.get_session(session)
-        response = self.crud_session.req(action, endpoint, params, session)
+        response = self._req(action, endpoint, params, session)
 
         if response.status_code == 200:
             deal_reference = json.loads(response.text)['dealReference']
@@ -469,8 +479,7 @@ class IGService:
 
         endpoint = '/positions/otc'
         action = 'create'
-        session = self.get_session(session)
-        response = self.crud_session.req(action, endpoint, params, session)
+        response = self._req(action, endpoint, params, session)
 
         if response.status_code == 200:
             deal_reference = json.loads(response.text)['dealReference']
@@ -484,11 +493,12 @@ class IGService:
             'limitLevel': limit_level,
             'stopLevel': stop_level
         }
-
-        endpoint = '/positions/otc/%s' % deal_id
+        url_params = {
+            'deal_id': deal_id
+        }
+        endpoint = '/positions/otc/{deal_id}'.format(**url_params)
         action = 'update'
-        session = self.get_session(session)
-        response = self.crud_session.req(action, endpoint, params, session)
+        response = self._req(action, endpoint, params, session)
 
         if response.status_code == 200:
             deal_reference = json.loads(response.text)['dealReference']
@@ -501,8 +511,7 @@ class IGService:
         params = {}
         endpoint = '/workingorders'
         action = 'read'
-        session = self.get_session(session)
-        response = self.crud_session.req(action, endpoint, params, session)
+        response = self._req(action, endpoint, params, session)
         data = self.parse_response(response.text)
         if self.return_dataframe:
             lst = data['workingOrders']
@@ -551,8 +560,7 @@ class IGService:
         }
         endpoint = '/workingorders/otc'
         action = 'create'
-        session = self.get_session(session)
-        response = self.crud_session.req(action, endpoint, params, session)
+        response = self._req(action, endpoint, params, session)
 
         if response.status_code == 200:
             deal_reference = json.loads(response.text)['dealReference']
@@ -563,10 +571,12 @@ class IGService:
     def delete_working_order(self, deal_id, session = None):
         """Deletes an OTC working order"""
         params = {}
-        endpoint = '/workingorders/otc/%s' % deal_id
+        url_params = {
+            'deal_id': deal_id
+        }
+        endpoint = '/workingorders/otc/{deal_id}'.format(**url_params)
         action = 'delete'
-        session = self.get_session(session)
-        response = self.crud_session.req(action, endpoint, params, session)
+        response = self._req(action, endpoint, params, session)
 
         if response.status_code == 200:
             deal_reference = json.loads(response.text)['dealReference']
@@ -587,10 +597,12 @@ class IGService:
             'timeInForce': time_in_force,
             'type': order_type
         }
-        endpoint = '/workingorders/otc/%s' % deal_id
+        url_params = {
+            'deal_id': deal_id
+        }
+        endpoint = '/workingorders/otc/{deal_id}'.format(**url_params)
         action = 'update'
-        session = self.get_session(session)
-        response = self.crud_session.req(action, endpoint, params, session)
+        response = self._req(action, endpoint, params, session)
 
         if response.status_code == 200:
             deal_reference = json.loads(response.text)['dealReference']
@@ -607,10 +619,12 @@ class IGService:
     def fetch_client_sentiment_by_instrument(self, market_id, session = None):
         """Returns the client sentiment for the given instrument's market"""
         params = {}
-        endpoint = '/clientsentiment/%s' % market_id
+        url_params = {
+            'market_id': market_id
+        }
+        endpoint = '/clientsentiment/{market_id}'.format(**url_params)
         action = 'read'
-        session = self.get_session(session)
-        response = self.crud_session.req(action, endpoint, params, session)
+        response = self._req(action, endpoint, params, session)
         data = self.parse_response(response.text)
         if self.return_bunch:
             data = bunchify(data)
@@ -619,10 +633,12 @@ class IGService:
     def fetch_related_client_sentiment_by_instrument(self, market_id, session = None):
         """Returns a list of related (also traded) client sentiment for the given instrument's market"""
         params = {}
-        endpoint = '/clientsentiment/related/%s' % market_id
+        url_params = {
+            'market_id': market_id
+        }
+        endpoint = '/clientsentiment/related/{market_id}'.format(**url_params)
         action = 'read'
-        session = self.get_session(session)
-        response = self.crud_session.req(action, endpoint, params, session)
+        response = self._req(action, endpoint, params, session)
         data = self.parse_response(response.text)
         if self.return_dataframe:
             data = pd.DataFrame(data['clientSentiments'])
@@ -633,8 +649,7 @@ class IGService:
         params = {}
         endpoint = '/marketnavigation'
         action = 'read'
-        session = self.get_session(session)
-        response = self.crud_session.req(action, endpoint, params, session)
+        response = self._req(action, endpoint, params, session)
         data = self.parse_response(response.text)
         if self.return_dataframe:
             data['markets'] = pd.DataFrame(data['markets'])
@@ -652,10 +667,12 @@ class IGService:
     def fetch_sub_nodes_by_node(self, node, session = None):
         """Returns all sub-nodes of the given node in the market navigation hierarchy"""
         params = {}
-        endpoint = '/marketnavigation/%s' % node
+        url_params = {
+            'node': node
+        }
+        endpoint = '/marketnavigation/{node}'.format(**url_params)
         action = 'read'
-        session = self.get_session(session)
-        response = self.crud_session.req(action, endpoint, params, session)
+        response = self._req(action, endpoint, params, session)
         data = self.parse_response(response.text)
         if self.return_dataframe:
             data['markets'] = pd.DataFrame(data['markets'])
@@ -665,10 +682,12 @@ class IGService:
     def fetch_market_by_epic(self, epic, session = None):
         """Returns the details of the given market"""
         params = {}
-        endpoint = '/markets/%s' % epic
+        url_params = {
+            'epic': epic
+        }
+        endpoint = '/markets/{epic}'.format(**url_params)
         action = 'read'
-        session = self.get_session(session)
-        response = self.crud_session.req(action, endpoint, params, session)
+        response = self._req(action, endpoint, params, session)
         data = self.parse_response(response.text)
         if self.return_bunch:
             data = bunchify(data)
@@ -681,8 +700,7 @@ class IGService:
             'searchTerm': search_term
         }
         action = 'read'
-        session = self.get_session(session)
-        response = self.crud_session.req(action, endpoint, params, session)
+        response = self._req(action, endpoint, params, session)
         data = self.parse_response(response.text)
         if self.return_dataframe:
             data = pd.DataFrame(data['markets'])
@@ -748,14 +766,18 @@ class IGService:
             df2 = pd.concat([df_bid, df_ask, df_spread, df_last], axis=1, keys=['bid', 'ask', 'spread', 'last'])
         return(df2)
 
-    def fetch_historical_prices_by_epic_and_num_points(self, epic, resolution, num_points, session = None):
+    def fetch_historical_prices_by_epic_and_num_points(self, epic, resolution, numpoints, session = None):
         """Returns a list of historical prices for the given epic, resolution, number of points"""
         resolution = conv_resol(resolution)
         params = {}
-        endpoint = "/prices/{epic}/{resolution}/{numpoints}".format(epic=epic, resolution=resolution, numpoints=num_points)
+        url_params = {
+            'epic': epic,
+            'resolution': resolution,
+            'numpoints': numpoints
+        }
+        endpoint = '/prices/{epic}/{resolution}/{numpoints}'.format(**url_params)
         action = 'read'
-        session = self.get_session(session)
-        response = self.crud_session.req(action, endpoint, params, session)
+        response = self._req(action, endpoint, params, session)
         data = self.parse_response(response.text)
         if self.return_dataframe:
             data['prices'] = self.format_prices(data['prices'])
@@ -766,22 +788,31 @@ class IGService:
         resolution = conv_resol(resolution)
         
         # v2
-        start_date = conv_datetime(start_date, 2)
-        end_date = conv_datetime(end_date, 2)
-        #endpoint = "/prices/{epic}/{resolution}/{startDate}/{endDate}".format(epic=epic, resolution=resolution, startDate=start_date, endDate=end_date)
+        #start_date = conv_datetime(start_date, 2)
+        #end_date = conv_datetime(end_date, 2)
         #params = {}
+        #url_params = {
+        #    'epic': epic,
+        #    'resolution': resolution,
+        #    'start_date': start_date,
+        #    'end_date': end_date
+        #}
+        #endpoint = "/prices/{epic}/{resolution}/{startDate}/{endDate}".format(**url_params)
 
         # v1
         start_date = conv_datetime(start_date, 1)
         end_date = conv_datetime(end_date, 1)
-        endpoint = "/prices/{epic}/{resolution}".format(epic=epic, resolution=resolution)
         params = {
             'startdate': start_date,
             'enddate': end_date
         }
+        url_params = {
+            'epic': epic,
+            'resolution': resolution
+        }
+        endpoint = "/prices/{epic}/{resolution}".format(**url_params)
         action = 'read'
-        session = self.get_session(session)
-        response = self.crud_session.req(action, endpoint, params, session)
+        response = self._req(action, endpoint, params, session)
         data = self.parse_response(response.text)
         if self.return_dataframe:
             data['prices'] = self.format_prices(data['prices'])
@@ -798,8 +829,7 @@ class IGService:
         params = {}
         endpoint = '/watchlists'
         action = 'read'
-        session = self.get_session(session)
-        response = self.crud_session.req(action, endpoint, params, session)
+        response = self._req(action, endpoint, params, session)
         data = self.parse_response(response.text)
         if self.return_dataframe:
             data = pd.DataFrame(data['watchlists'])
@@ -813,28 +843,31 @@ class IGService:
         }
         endpoint = '/watchlists'
         action = 'create'
-        session = self.get_session(session)
-        response = self.crud_session.req(action, endpoint, params, session)
+        response = self._req(action, endpoint, params, session)
         data = self.parse_response(response.text)
         return(data)
 
     def delete_watchlist(self, watchlist_id, session = None):
         """Deletes a watchlist"""
         params = {}
-        endpoint = '/watchlists/%s' % watchlist_id
+        url_params = {
+            'watchlist_id': watchlist_id
+        }
+        endpoint = '/watchlists/{watchlist_id}'.format(**url_params)
         action = 'delete'
-        session = self.get_session(session)
-        response = self.crud_session.req(action, endpoint, params, session)
+        response = self._req(action, endpoint, params, session)
         return(response.text)
 
 
     def fetch_watchlist_markets(self, watchlist_id, session = None):
         """Returns the given watchlist's markets"""
         params = {}
-        endpoint = '/watchlists/%s' % watchlist_id
+        url_params = {
+            'watchlist_id': watchlist_id
+        }
+        endpoint = '/watchlists/{watchlist_id}'.format(**url_params)
         action = 'read'
-        session = self.get_session(session)
-        response = self.crud_session.req(action, endpoint, params, session)
+        response = self._req(action, endpoint, params, session)
         data = self.parse_response(response.text)
         if self.return_dataframe:
             data = pd.DataFrame(data['markets'])
@@ -846,20 +879,25 @@ class IGService:
         params = { 
             'epic': epic
         }
-        endpoint = '/watchlists/%s' % watchlist_id
+        url_params = {
+            'watchlist_id': watchlist_id
+        }
+        endpoint = '/watchlists/{watchlist_id}'.format(**url_params)
         action = 'update'
-        session = self.get_session(session)
-        response = self.crud_session.req(action, endpoint, params, session)
+        response = self._req(action, endpoint, params, session)
         data = self.parse_response(response.text)
         return(data)
 
     def remove_market_from_watchlist(self, watchlist_id, epic, session = None):
         """Remove an market from a watchlist"""
         params = {}
-        endpoint = '/watchlists/%s/%s' % (watchlist_id, epic)
+        url_params = {
+            'watchlist_id': watchlist_id,
+            'epic': epic
+        }
+        endpoint = '/watchlists/{watchlist_id}/{epic}'.format(**url_params)
         action = 'delete'
-        session = self.get_session(session)
-        response = self.crud_session.req(action, endpoint, params, session)
+        response = self._req(action, endpoint, params, session)
         return(response.text)
 
     ############ END ############
@@ -873,8 +911,7 @@ class IGService:
         params = {}
         endpoint = '/session'
         action = 'delete'
-        session = self.get_session(session)
-        response = self.crud_session.req(action, endpoint, params, session)
+        response = self._req(action, endpoint, params, session)
 
     def create_session(self, session = None):
         """Creates a trading session, obtaining session tokens for subsequent API access"""
@@ -884,8 +921,8 @@ class IGService:
         }
         endpoint = '/session'
         action = 'create'
-        session = self.get_session(session)
-        response = self.crud_session.req(action, endpoint, params, session) # first create (BASIC_HEADERS)
+        # this is the first create (BASIC_HEADERS)
+        response = self._req(action, endpoint, params, session)
         data = self.parse_response(response.text)
         return(data)
 
@@ -897,8 +934,7 @@ class IGService:
         }
         endpoint = '/session'
         action = 'update'
-        session = self.get_session(session)
-        response = self.crud_session.req(action, endpoint, params, session)
+        response = self._req(action, endpoint, params, session)
         self._set_headers(response.headers, False)
         data = self.parse_response(response.text)
         return(data)
@@ -914,8 +950,7 @@ class IGService:
         params = {}
         endpoint = '/operations/application'
         action = 'read'
-        session = self.get_session(session)
-        response = self.crud_session.req(action, endpoint, params, session)
+        response = self._req(action, endpoint, params, session)
         data = self.parse_response(response.text)
         return(data)
 
@@ -929,8 +964,7 @@ class IGService:
         }
         endpoint = '/operations/application'
         action = 'update'
-        session = self.get_session(session)
-        response = self.crud_session.req(action, endpoint, params, session)
+        response = self._req(action, endpoint, params, session)
         data = self.parse_response(response.text)
         return(data)
 
@@ -940,8 +974,7 @@ class IGService:
         params = {}
         endpoint = '/operations/application/disable'
         action = 'update'
-        session = self.get_session(session)
-        response = self.crud_session.req(action, endpoint, params, session)
+        response = self._req(action, endpoint, params, session)
         data = self.parse_response(response.text)
         return(data)
         
