@@ -246,6 +246,8 @@ class IGService:
 
         if session is None:
             self.session = Session() # Requests Session (global)
+        else:
+            self.session = session
 
         self.crud_session = IG_Session_CRUD(self.BASE_URL, self.API_KEY, self.session)
 
