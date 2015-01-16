@@ -20,7 +20,7 @@ from pandas.io.json import json_normalize
 from pandas.tseries.frequencies import to_offset
 import six
 
-from version import __author__, __copyright__, __credits__, \
+from .version import __author__, __copyright__, __credits__, \
     __license__, __version__, __maintainer__, __email__, __status__, __url__
 
 
