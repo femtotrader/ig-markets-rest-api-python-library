@@ -181,8 +181,8 @@ def test_ig_service():
         print("")
 
         print("fetch_historical_prices_by_epic_and_date_range")
-        start_date = datetime.datetime(2014, 12, 15)
-        end_date = datetime.datetime(2014, 12, 20)
+        start_date = datetime(2014, 12, 15)
+        end_date = datetime(2014, 12, 20)
         response = ig_service.fetch_historical_prices_by_epic_and_date_range(epic, resolution, start_date, end_date)
         print(response)
         assert(isinstance(response['allowance'], dict))
