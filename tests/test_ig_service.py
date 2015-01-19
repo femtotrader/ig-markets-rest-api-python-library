@@ -35,7 +35,7 @@ export IG_SERVICE_ACC_NUMBER=""
 
 def test_ig_service():
 
-    DELAY = 15
+    DELAY = 30
     def wait(delay):
         print("Wait %s s to avoid error.public-api.exceeded-account-allowance" % delay)
         time.sleep(delay)
@@ -50,7 +50,8 @@ def test_ig_service():
         assert(isinstance(trading_ig.__version__, six.string_types))
 
         config = ConfigEnvVar("IG_SERVICE")
-        ig_service = IGService(config.username, config.password, config.api_key, config.acc_type)
+        #ig_service = IGService(config.username, config.password, config.api_key, config.acc_type)
+        ig_service = IGService(config.username, config.password, config.api_key, config.acc_type, session)
         ig_service.create_session()
 
         print("fetch_accounts")
