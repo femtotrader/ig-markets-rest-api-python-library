@@ -16,6 +16,7 @@ import os
 import datetime
 #from datetime import datetime, timedelta
 import six
+import time
 
 """
 Environment variables must be set using
@@ -67,6 +68,7 @@ def test_ig_service():
     print(response)
     assert(isinstance(response, pd.DataFrame))
 
+    time.sleep(15)
     print("")
 
     print("fetch_open_positions")
@@ -113,6 +115,7 @@ def test_ig_service():
     assert(isinstance(response['nodes'], pd.DataFrame))
 
     print("")
+    time.sleep(15)
 
     print("fetch_all_watchlists")
     response = ig_service.fetch_all_watchlists()
