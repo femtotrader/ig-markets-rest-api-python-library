@@ -14,6 +14,7 @@ import pandas as pd
 import pprint
 import os
 import datetime
+import requests_cache
 #from datetime import datetime, timedelta
 import six
 import time

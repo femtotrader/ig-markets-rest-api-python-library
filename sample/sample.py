@@ -12,8 +12,7 @@ logger.setLevel(logging.DEBUG)
 # if you need to cache to DB your requests
 from datetime import datetime, timedelta
 import requests_cache
-session = requests_cache.CachedSession(cache_name='cache', backend='sqlite', expire_after=60*60) # not supported with 0.4.8
-#session = requests_cache.CachedSession(cache_name='cache', backend='sqlite', expire_after=timedelta(hours=1)) # not supported with 0.4.8
+session = requests_cache.CachedSession(cache_name='cache', backend='sqlite', expire_after=timedelta(hours=1))
 # set expire_after=None if you don't want cache expiration
 # set expire_after=0 if you don't want to cache queries
 
