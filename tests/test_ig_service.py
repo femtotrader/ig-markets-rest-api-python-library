@@ -31,8 +31,12 @@ export IG_SERVICE_ACC_NUMBER=""
 
 
 
-
 def test_ig_service():
+    DELAY = 15
+    def wait(delay):
+        print("Wait %s s to avoid error.public-api.exceeded-account-allowance" % delay)
+        time.sleep(delay)
+
     pp = pprint.PrettyPrinter(indent=4)
 
     assert(isinstance(trading_ig.__version__, six.string_types))
@@ -68,7 +72,7 @@ def test_ig_service():
     print(response)
     assert(isinstance(response, pd.DataFrame))
 
-    time.sleep(15)
+    wait(DELAY)
     print("")
 
     print("fetch_open_positions")
@@ -115,7 +119,7 @@ def test_ig_service():
     assert(isinstance(response['nodes'], pd.DataFrame))
 
     print("")
-    time.sleep(15)
+    wait(DELAY)
 
     print("fetch_all_watchlists")
     response = ig_service.fetch_all_watchlists()
