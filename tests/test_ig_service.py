@@ -190,3 +190,6 @@ def test_ig_service():
         #assert(isinstance(response['prices']['volume'], pd.Series))
         #assert(isinstance(response['prices']['price'], pd.Panel))
         assert(isinstance(response['prices'], pd.DataFrame))
+
+        wait(DELAY)
+        print("")
