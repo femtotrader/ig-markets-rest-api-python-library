@@ -34,14 +34,16 @@ else:
     _HAS_PANDAS = True
 
 try:
-    from bunch import bunchify
+    if six.PY2:
+        from bunch import bunchify
+        _HAS_BUNCH = True
+    else:
+        logging.warning("No Bunch support for PY3")
+        # see https://github.com/dsc/bunch/
+        _HAS_BUNCH = False
 except ImportError:
     _HAS_BUNCH = False
     logging.warning("Can't import %r" % "bunch")
-else:
-    _HAS_BUNCH = True
-
-
 
 
 class IG_Session_CRUD(object):
