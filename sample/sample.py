@@ -10,7 +10,8 @@ logger = logging.getLogger()
 logger.setLevel(logging.DEBUG)
 
 # if you need to cache to DB your requests
-from datetime import datetime, timedelta
+import datetime
+from datetime import timedelta
 import requests_cache
 expire_after = timedelta(hours=1)
 session = requests_cache.CachedSession(cache_name='cache', backend='sqlite', expire_after=expire_after)
@@ -43,15 +44,20 @@ print("working_orders:\n%s" % working_orders)
 
 print("")
 
-epic = 'CS.D.EURUSD.MINI.IP'
-#epic = 'IX.D.ASX.IFM.IP' # US (SPY) - mini
+#epic = 'CS.D.EURUSD.MINI.IP'
+epic = 'IX.D.ASX.IFM.IP' # US (SPY) - mini
+
 resolution = 'D'
+# see from pandas.tseries.frequencies import to_offset
+# resolution = 'H'
+# resolution = '1Min'
+
 num_points = 10
 
-#response = ig_service.fetch_historical_prices_by_epic_and_num_points(epic, resolution, num_points)
+response = ig_service.fetch_historical_prices_by_epic_and_num_points(epic, resolution, num_points)
 
 # if you want to cache this query
-response = ig_service.fetch_historical_prices_by_epic_and_num_points(epic, resolution, num_points, session)
+#response = ig_service.fetch_historical_prices_by_epic_and_num_points(epic, resolution, num_points, session)
 
 df_ask = response['prices']['ask']
 print("ask prices:\n%s" % df_ask)
