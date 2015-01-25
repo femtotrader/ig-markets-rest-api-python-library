@@ -157,6 +157,7 @@ def test_ig_service():
 
         print("search_markets")
         search_term = 'EURUSD'
+        #search_term = 'SPY'
         response = ig_service.search_markets(search_term)
         print(response)
         assert(isinstance(response, pd.DataFrame))
@@ -166,6 +167,8 @@ def test_ig_service():
         print("fetch_historical_prices_by_epic_and_num_points")
 
         #epic = 'CS.D.EURUSD.MINI.IP'
+        #epic = 'IX.D.ASX.IFM.IP' # US 500 (SPY)
+        #epic = 'IX.D.ASX.IFM.IP' # US (SPY) - mini
         #resolution = 'HOUR' # MINUTE, MINUTE_2, MINUTE_3, MINUTE_5, MINUTE_10, MINUTE_15, MINUTE_30, HOUR, HOUR_2, HOUR_3, HOUR_4, DAY, WEEK, MONTH
         resolution = 'H' # http://pandas.pydata.org/pandas-docs/stable/timeseries.html#dateoffset-objects
         num_points = 10
