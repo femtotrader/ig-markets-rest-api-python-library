@@ -49,10 +49,10 @@ def main():
     #epic = 'CS.D.EURUSD.MINI.IP'
     epic = 'IX.D.ASX.IFM.IP' # US (SPY) - mini
 
-    resolution = 'D'
+    #resolution = 'D'
     # see from pandas.tseries.frequencies import to_offset
     #resolution = 'H'
-    #resolution = '1Min'
+    resolution = '1Min'
 
     #num_points = 10
     #response = ig_service.fetch_historical_prices_by_epic_and_num_points(epic, resolution, num_points)
