@@ -188,3 +188,18 @@ Get latest version using Git
     $ git clone https://github.com/femtotrader/ig-markets-rest-api-python-library.git
     $ cd ig-markets-rest-api-python-library
     $ python setup.py install
+
+
+Stream API
+~~~~~~~~~~
+If you need to get realtime data such as tick price,
+
+see https://github.com/femtotrader/ig-markets-stream-api-python-library
+
+Other projects
+~~~~~~~~~~~~~~
+* igtrade (and forks)
+
+   * https://github.com/maroxe/igtrade
+   * https://github.com/falex69/igtrade
+   * https://github.com/yopibou/L3
