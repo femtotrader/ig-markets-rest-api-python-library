@@ -24,6 +24,10 @@
 .. image:: https://badges.gitter.im/Join%20Chat.svg
    :target: https://gitter.im/femtotrader/ig-markets-rest-api-python-library?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge
 
+.. image:: https://landscape.io/github/femtotrader/ig-markets-rest-api-python-library/master/landscape.svg?style=flat
+   :target: https://landscape.io/github/femtotrader/ig-markets-rest-api-python-library/master
+   :alt: Code Health
+
 .. image:: https://travis-ci.org/femtotrader/ig-markets-rest-api-python-library.svg?branch=master
     :target: https://travis-ci.org/femtotrader/ig-markets-rest-api-python-library
 
