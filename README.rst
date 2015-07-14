@@ -18,6 +18,10 @@
     :target: https://pypi.python.org/pypi/trading_ig/
     :alt: Development Status
 
+.. image:: https://requires.io/github/femtotrader/ig-markets-rest-api-python-library/requirements.svg?branch=master
+     :target: https://requires.io/github/femtotrader/ig-markets-rest-api-python-library/requirements/?branch=master
+     :alt: Requirements Status
+
 .. image:: https://sourcegraph.com/api/repos/github.com/femtotrader/ig-markets-rest-api-python-library/.badges/status.png
    :target: https://sourcegraph.com/github.com/femtotrader/ig-markets-rest-api-python-library
 
