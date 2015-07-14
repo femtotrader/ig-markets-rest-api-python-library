@@ -9,13 +9,10 @@ Modified by Femto Trader - 2014-2015
 
 """
 
-import requests
 from requests import Session
 import json
 import logging
 import traceback
-import os
-import datetime
 from pandas.io.json import json_normalize
 from pandas.tseries.frequencies import to_offset
 import six
@@ -23,13 +20,11 @@ import six
 from .version import __author__, __copyright__, __credits__, \
     __license__, __version__, __maintainer__, __email__, __status__, __url__
 
-
-
 try:
     import pandas as pd
 except ImportError:
     _HAS_PANDAS = False
-    logging.warning("Can't import %r" % "pandas")
+    logging.warning("Can't import pandas")
 else:
     _HAS_PANDAS = True
 
@@ -43,7 +38,7 @@ try:
         _HAS_BUNCH = False
 except ImportError:
     _HAS_BUNCH = False
-    logging.warning("Can't import %r" % "bunch")
+    logging.warning("Can't import bunch")
 
 
 class IG_Session_CRUD(object):
@@ -138,12 +133,12 @@ class IG_Session_CRUD(object):
 
     def _set_headers(self, response_headers, update_cst):
         """Sets headers"""
-        if update_cst == True:
+        if update_cst:
             self.CLIENT_TOKEN = response_headers['CST']
 
-        try:
+        if 'X-SECURITY-TOKEN' in response_headers:
             self.SECURITY_TOKEN = response_headers['X-SECURITY-TOKEN']
-        except:
+        else:
             self.SECURITY_TOKEN = None
 
         self.HEADERS['LOGGED_IN'] = { 
@@ -180,12 +175,14 @@ def conv_resol(resolution):
         to_offset('W'): 'WEEK',
         to_offset('M'): 'MONTH'
     }
-    try:
-        return(d[to_offset(resolution)])
-    except:
+    offset = to_offset(resolution)
+    if offset in d:
+        return d[offset]
+    else:
         logging.error(traceback.format_exc())
         logging.warning("conv_resol returns '%s'" % resolution)
         return(resolution)
+
 
 def conv_datetime(dt, version=1):
     """Converts dt to string like
@@ -200,12 +197,13 @@ def conv_datetime(dt, version=1):
             1: "%Y:%m:%d-%H:%M:%S",
             2: "%Y-%m-%d %H:%M:%S"
         }
-        format = d_formats[version]
-        return(dt.strftime(format))
-    except:
+        fmt = d_formats[version]
+        return(dt.strftime(fmt))
+    except (ValueError, TypeError):
         logging.error(traceback.format_exc())
-        logging.warning("conv_datetime returns '%s'" % dt)
+        logging.warning("conv_datetime returns", dt)
         return(dt)
+
 
 def conv_to_ms(td):
     """Converts td to integer number of milliseconds"""
@@ -214,10 +212,11 @@ def conv_to_ms(td):
             return(td)
         else:
             return(int(td.total_seconds()*1000.0))
-    except:
+    except ValueError:
         logging.error(traceback.format_exc())
         logging.warning("conv_to_ms returns '%s'" % td)
         return(td)
+
 
 class IGService:
 
@@ -295,9 +294,9 @@ class IGService:
     def colname_unique(self, d_cols):
         """Returns a set of column names (unique)"""
         s = set()
-        for col, lst in d_cols.items():
-             for colname in lst:
-                 s.add(colname)
+        for _, lst in d_cols.items():
+            for colname in lst:
+                s.add(colname)
         return(s)
 
     def expand_columns(self, data, d_cols, flag_col_prefix=False,
@@ -908,7 +907,7 @@ class IGService:
         params = {}
         endpoint = '/session'
         action = 'delete'
-        response = self._req(action, endpoint, params, session)
+        self._req(action, endpoint, params, session)
 
     def create_session(self, session = None):
         """Creates a trading session, obtaining session tokens for subsequent API access"""
