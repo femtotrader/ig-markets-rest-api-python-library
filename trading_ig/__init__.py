@@ -300,8 +300,11 @@ class IGService:
                  s.add(colname)
         return(s)
 
-    def expand_columns(self, data, d_cols, flag_col_prefix=False, col_overlap_allowed=[]):
+    def expand_columns(self, data, d_cols, flag_col_prefix=False,
+                       col_overlap_allowed=None):
         """Expand columns"""
+        if col_overlap_allowed is None:
+            col_overlap_allowed = []
         for (col_lev1, lst_col) in d_cols.items():
             ser = data[col_lev1]
             del data[col_lev1]
