@@ -1,22 +1,26 @@
-.. image:: https://pypip.in/version/trading_ig/badge.svg
+.. image:: https://img.shields.io/pypi/v/trading_ig.svg
     :target: https://pypi.python.org/pypi/trading_ig/
     :alt: Latest Version
 
-.. image:: https://pypip.in/py_versions/trading_ig/badge.svg
+.. image:: https://img.shields.io/pypi/pyversions/trading_ig.svg
     :target: https://pypi.python.org/pypi/trading_ig/
     :alt: Supported Python versions
 
-.. image:: https://pypip.in/format/trading_ig/badge.svg
+.. image:: https://img.shields.io/pypi/wheel/trading_ig.svg
     :target: https://pypi.python.org/pypi/trading_ig/
-    :alt: Download format
+    :alt: Wheel format
 
-.. image:: https://pypip.in/license/trading_ig/badge.svg
+.. image:: https://img.shields.io/pypi/l/trading_ig.svg
     :target: https://pypi.python.org/pypi/trading_ig/
     :alt: License
 
-.. image:: https://pypip.in/status/trading_ig/badge.svg
+.. image:: https://img.shields.io/pypi/status/trading_ig.svg
     :target: https://pypi.python.org/pypi/trading_ig/
     :alt: Development Status
+
+.. image:: https://img.shields.io/pypi/dm/trading_ig.svg
+    :target: https://pypi.python.org/pypi/trading_ig/
+    :alt: Downloads monthly
 
 .. image:: https://requires.io/github/femtotrader/ig-markets-rest-api-python-library/requirements.svg?branch=master
      :target: https://requires.io/github/femtotrader/ig-markets-rest-api-python-library/requirements/?branch=master
