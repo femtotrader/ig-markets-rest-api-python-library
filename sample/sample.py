@@ -1,7 +1,6 @@
 #!/usr/bin/env python
-#-*- coding:utf-8 -*-
+# -*- coding:utf-8 -*-
 
-import trading_ig
 from trading_ig import IGService
 from trading_ig_config import config
 import logging
@@ -10,9 +9,9 @@ logger = logging.getLogger()
 logger.setLevel(logging.DEBUG)
 
 # if you need to cache to DB your requests
-import datetime
 from datetime import timedelta
 import requests_cache
+
 
 def main():
     expire_after = timedelta(hours=1)
@@ -71,7 +70,6 @@ def main():
     df_ask = response['prices']['ask']
     print("ask prices:\n%s" % df_ask)
 
-    #print(trading_ig.__version__)
 
 if __name__ == '__main__':
     main()
