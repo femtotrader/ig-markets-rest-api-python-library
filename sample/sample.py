@@ -5,7 +5,7 @@ from trading_ig import IGService
 from trading_ig.config import config
 import logging
 
-logger = logging.getLogger()
+logger = logging.getLogger(__name__)
 logger.setLevel(logging.DEBUG)
 
 # if you need to cache to DB your requests

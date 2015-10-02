@@ -9,8 +9,6 @@ Modified by Femto Trader - 2014-2015 - https://github.com/femtotrader/
 """
 
 import json
-import pandas as pd
-from pandas.io.json import json_normalize
 
 from requests import Session
 
@@ -270,7 +268,8 @@ class IGService:
         action = 'read'
         response = self._req(action, endpoint, params, session)
         data = self.parse_response(response.text)
-        if self.return_dataframe:
+        if _HAS_PANDAS and self.return_dataframe:
+            import pandas as pd
             data = pd.DataFrame(data['accounts'])
             d_cols = {
                 'balance': [u'available', u'balance', u'deposit', u'profitLoss']
@@ -298,7 +297,8 @@ class IGService:
         action = 'read'
         response = self._req(action, endpoint, params, session)
         data = self.parse_response(response.text)
-        if self.return_dataframe:
+        if _HAS_PANDAS and self.return_dataframe:
+            import pandas as pd
             data = pd.DataFrame(data['activities'])
 
             if len(data) == 0:
@@ -326,7 +326,8 @@ class IGService:
         action = 'read'
         response = self._req(action, endpoint, params, session)
         data = self.parse_response(response.text)
-        if self.return_dataframe:
+        if _HAS_PANDAS and self.return_dataframe:
+            import pandas as pd
             data = pd.DataFrame(data['transactions'])
 
             if len(data) == 0:
@@ -364,7 +365,8 @@ class IGService:
         action = 'read'
         response = self._req(action, endpoint, params, session)
         data = self.parse_response(response.text)
-        if self.return_dataframe:
+        if _HAS_PANDAS and self.return_dataframe:
+            import pandas as pd
             lst = data['positions']
             data = pd.DataFrame(lst)
 
@@ -470,7 +472,8 @@ class IGService:
         action = 'read'
         response = self._req(action, endpoint, params, session)
         data = self.parse_response(response.text)
-        if self.return_dataframe:
+        if _HAS_PANDAS and self.return_dataframe:
+            import pandas as pd
             lst = data['workingOrders']
             data = pd.DataFrame(lst)
 
@@ -600,6 +603,7 @@ class IGService:
         response = self._req(action, endpoint, params, session)
         data = self.parse_response(response.text)
         if self.return_bunch:
+            from .utils import bunchify
             data = bunchify(data)
         return(data)
 
@@ -615,7 +619,8 @@ class IGService:
         action = 'read'
         response = self._req(action, endpoint, params, session)
         data = self.parse_response(response.text)
-        if self.return_dataframe:
+        if _HAS_PANDAS and self.return_dataframe:
+            import pandas as pd
             data = pd.DataFrame(data['clientSentiments'])
         return data
 
@@ -627,7 +632,8 @@ class IGService:
         action = 'read'
         response = self._req(action, endpoint, params, session)
         data = self.parse_response(response.text)
-        if self.return_dataframe:
+        if _HAS_PANDAS and self.return_dataframe:
+            import pandas as pd
             data['markets'] = pd.DataFrame(data['markets'])
             if len(data['markets']) == 0:
                 columns = ['bid', 'delayTime', 'epic', 'expiry', 'high',
@@ -643,6 +649,7 @@ class IGService:
         # if self.return_bunch:
         #     # ToFix: ValueError: The truth value of a DataFrame is ambiguous.
         #     # Use a.empty, a.bool(), a.item(), a.any() or a.all().
+        #     from .utils import bunchify
         #     data = bunchify(data)
         return data
 
@@ -657,7 +664,8 @@ class IGService:
         action = 'read'
         response = self._req(action, endpoint, params, session)
         data = self.parse_response(response.text)
-        if self.return_dataframe:
+        if _HAS_PANDAS and self.return_dataframe:
+            import pandas as pd
             data['markets'] = pd.DataFrame(data['markets'])
             data['nodes'] = pd.DataFrame(data['nodes'])
         return data
@@ -672,7 +680,8 @@ class IGService:
         action = 'read'
         response = self._req(action, endpoint, params, session)
         data = self.parse_response(response.text)
-        if self.return_bunch:
+        if _HAS_BUNCH and self.return_bunch:
+            from .utils import bunchify
             data = bunchify(data)
         return data
 
@@ -685,7 +694,8 @@ class IGService:
         action = 'read'
         response = self._req(action, endpoint, params, session)
         data = self.parse_response(response.text)
-        if self.return_dataframe:
+        if _HAS_PANDAS and self.return_dataframe:
+            import pandas as pd
             data = pd.DataFrame(data['markets'])
         return data
 
@@ -697,6 +707,7 @@ class IGService:
                 Open High Low Close as Minor_axis axis
          - 'volume' : a timeserie for lastTradedVolume
         """
+        import pandas as pd
         df = pd.DataFrame(prices)
         df = df.set_index('snapshotTime')
         df.index.name = 'DateTime'
@@ -725,6 +736,9 @@ class IGService:
     def format_prices(self, prices, flag_calc_spread=True):
         """Format prices data as a DataFrame with hierarchical columns"""
 
+        import pandas as pd
+        from pandas.io.json import json_normalize
+
         def cols(typ):
             return({
                 'openPrice.%s' % typ: 'Open',
@@ -733,7 +747,6 @@ class IGService:
                 'closePrice.%s' % typ: 'Close',
                 'lastTradedVolume': 'Volume'
             })
-
         df = json_normalize(prices)
         df = df.set_index('snapshotTime')
         df.index.name = 'DateTime'
@@ -780,7 +793,7 @@ class IGService:
         action = 'read'
         response = self._req(action, endpoint, params, session)
         data = self.parse_response(response.text)
-        if self.return_dataframe:
+        if _HAS_PANDAS and self.return_dataframe:
             data['prices'] = self.format_prices(data['prices'])
         return(data)
 
@@ -836,7 +849,8 @@ class IGService:
         action = 'read'
         response = self._req(action, endpoint, params, session)
         data = self.parse_response(response.text)
-        if self.return_dataframe:
+        if _HAS_PANDAS and self.return_dataframe:
+            import pandas as pd
             data = pd.DataFrame(data['watchlists'])
         return data
 
@@ -873,7 +887,8 @@ class IGService:
         action = 'read'
         response = self._req(action, endpoint, params, session)
         data = self.parse_response(response.text)
-        if self.return_dataframe:
+        if _HAS_PANDAS and self.return_dataframe:
+            import pandas as pd
             data = pd.DataFrame(data['markets'])
         return data
 
@@ -928,6 +943,7 @@ class IGService:
         # this is the first create (BASIC_HEADERS)
         response = self._req(action, endpoint, params, session)
         data = self.parse_response(response.text)
+        self.ig_session = data # store IG session
         return data
 
     def switch_account(self, account_id, default_account, session=None):

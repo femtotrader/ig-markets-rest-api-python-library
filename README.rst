@@ -22,18 +22,18 @@
     :target: https://pypi.python.org/pypi/trading_ig/
     :alt: Downloads monthly
 
-.. image:: https://requires.io/github/femtotrader/ig-markets-rest-api-python-library/requirements.svg?branch=master
-     :target: https://requires.io/github/femtotrader/ig-markets-rest-api-python-library/requirements/?branch=master
+.. image:: https://requires.io/github/ig-python/ig-markets-rest-api-python-library/requirements.svg?branch=master
+     :target: https://requires.io/github/ig-python/ig-markets-rest-api-python-library/requirements/?branch=master
      :alt: Requirements Status
 
-.. image:: https://sourcegraph.com/api/repos/github.com/femtotrader/ig-markets-rest-api-python-library/.badges/status.png
-   :target: https://sourcegraph.com/github.com/femtotrader/ig-markets-rest-api-python-library
+.. image:: https://sourcegraph.com/api/repos/github.com/ig-python/ig-markets-rest-api-python-library/.badges/status.png
+   :target: https://sourcegraph.com/github.com/ig-python/ig-markets-rest-api-python-library
 
 .. image:: https://badges.gitter.im/Join%20Chat.svg
-   :target: https://gitter.im/femtotrader/ig-markets-rest-api-python-library?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge
+   :target: https://gitter.im/ig-python/ig-markets-rest-api-python-library?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge
 
-.. image:: https://landscape.io/github/femtotrader/ig-markets-rest-api-python-library/master/landscape.svg?style=flat
-   :target: https://landscape.io/github/femtotrader/ig-markets-rest-api-python-library/master
+.. image:: https://landscape.io/github/ig-python/ig-markets-rest-api-python-library/master/landscape.svg?style=flat
+   :target: https://landscape.io/github/ig-python/ig-markets-rest-api-python-library/master
    :alt: Code Health
 
 .. image:: https://travis-ci.org/femtotrader/ig-markets-rest-api-python-library.svg?branch=master

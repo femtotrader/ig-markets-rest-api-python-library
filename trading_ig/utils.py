@@ -6,15 +6,14 @@ import traceback
 import six
 
 import pandas as pd
-from pandas.tseries.frequencies import to_offset
 
-log = logging.getLogger("trading_ig")
+logger = logging.getLogger(__name__)
 
 try:
     import pandas as pd
 except ImportError:
     _HAS_PANDAS = False
-    log.warning("Can't import pandas")
+    logger.warning("Can't import pandas")
 else:
     _HAS_PANDAS = True
 
@@ -22,35 +21,39 @@ try:
     from infi.bunch import bunchify
 except ImportError:
     _HAS_BUNCH = False
-    log.warning("Can't import bunch")
+    logger.warning("Can't import bunch")
 else:
     _HAS_BUNCH = True
 
 def conv_resol(resolution):
     """Returns a string for resolution (from a Pandas)
     """
-    d = {
-        to_offset('1Min'):'MINUTE',
-        to_offset('2Min'):'MINUTE_2',
-        to_offset('3Min'):'MINUTE_3',
-        to_offset('5Min'):'MINUTE_5',
-        to_offset('10Min'):'MINUTE_10',
-        to_offset('15Min'):'MINUTE_15',
-        to_offset('30Min'): 'MINUTE_30',
-        to_offset('1H'): 'HOUR',
-        to_offset('2H'): 'HOUR_2',
-        to_offset('3H'): 'HOUR_3',
-        to_offset('4H'): 'HOUR_4',
-        to_offset('D'): 'DAY',
-        to_offset('W'): 'WEEK',
-        to_offset('M'): 'MONTH'
-    }
-    offset = to_offset(resolution)
-    if offset in d:
-        return d[offset]
+    if _HAS_PANDAS:
+        from pandas.tseries.frequencies import to_offset
+        d = {
+            to_offset('1Min'):'MINUTE',
+            to_offset('2Min'):'MINUTE_2',
+            to_offset('3Min'):'MINUTE_3',
+            to_offset('5Min'):'MINUTE_5',
+            to_offset('10Min'):'MINUTE_10',
+            to_offset('15Min'):'MINUTE_15',
+            to_offset('30Min'): 'MINUTE_30',
+            to_offset('1H'): 'HOUR',
+            to_offset('2H'): 'HOUR_2',
+            to_offset('3H'): 'HOUR_3',
+            to_offset('4H'): 'HOUR_4',
+            to_offset('D'): 'DAY',
+            to_offset('W'): 'WEEK',
+            to_offset('M'): 'MONTH'
+        }
+        offset = to_offset(resolution)
+        if offset in d:
+            return d[offset]
+        else:
+            logger.error(traceback.format_exc())
+            logger.warning("conv_resol returns '%s'" % resolution)
+            return resolution
     else:
-        logging.error(traceback.format_exc())
-        logging.warning("conv_resol returns '%s'" % resolution)
         return resolution
 
 
@@ -61,7 +64,9 @@ def conv_datetime(dt, version=1):
     """
     try:
         if isinstance(dt, six.string_types):
-            dt = pd.to_datetime(dt)
+            if _HAS_PANDAS:
+                import pandas as pd
+                dt = pd.to_datetime(dt)
 
         d_formats = {
             1: "%Y:%m:%d-%H:%M:%S",
@@ -70,8 +75,8 @@ def conv_datetime(dt, version=1):
         fmt = d_formats[version]
         return dt.strftime(fmt)
     except (ValueError, TypeError):
-        logging.error(traceback.format_exc())
-        logging.warning("conv_datetime returns", dt)
+        logger.error(traceback.format_exc())
+        logger.warning("conv_datetime returns %s" % dt)
         return dt
 
 
@@ -83,6 +88,6 @@ def conv_to_ms(td):
         else:
             return int(td.total_seconds() * 1000.0)
     except ValueError:
-        logging.error(traceback.format_exc())
-        logging.warning("conv_to_ms returns '%s'" % td)
+        logger.error(traceback.format_exc())
+        logger.warning("conv_to_ms returns '%s'" % td)
         return td

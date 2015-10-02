@@ -7,7 +7,7 @@ import logging
 ENV_VAR_ROOT = "IG_SERVICE"
 CONFIG_FILE_NAME = "trading_ig_config.py"
 
-log = logging.getLogger("trading_ig.config")
+logger = logging.getLogger(__name__)
 
 class ConfigEnvVar(object):
     def __init__(self, env_var_base):
@@ -29,13 +29,13 @@ class ConfigEnvVar(object):
 
 try:
     from trading_ig_config import config
-    print("import config from %s" % CONFIG_FILE_NAME)
+    logger.info("import config from %s" % CONFIG_FILE_NAME)
 except:
-    print("can't import config from config file")
+    logger.warning("can't import config from config file")
     try:
         config = ConfigEnvVar(ENV_VAR_ROOT)
-        print("import config from environment variables '%s_...'" % ENV_VAR_ROOT)
+        logger.info("import config from environment variables '%s_...'" % ENV_VAR_ROOT)
     except:
-        print("can't import config from environment variables")
+        logger.warning("can't import config from environment variables")
         raise("""Can't import config - you might create a '%s' filename or use
 environment variables such as '%s_...'""" % (CONFIG_FILE_NAME, ENV_VAR_ROOT))
