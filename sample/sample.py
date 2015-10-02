@@ -2,7 +2,7 @@
 # -*- coding:utf-8 -*-
 
 from trading_ig import IGService
-from trading_ig_config import config
+from trading_ig.config import config
 import logging
 
 logger = logging.getLogger()
@@ -62,7 +62,7 @@ def main():
     #df_ask = response['prices']['ask']
     #print("ask prices:\n%s" % df_ask)
 
-    (start_date, end_date) = ('2015-01-15', '2015-01-28')
+    (start_date, end_date) = ('2015-09-15', '2015-09-28')
     #response = ig_service.fetch_historical_prices_by_epic_and_date_range(epic, resolution, start_date, end_date)
 
     # if you want to cache this query

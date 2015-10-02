@@ -7,7 +7,7 @@ from os import path
 import io
 
 NAME = 'trading_ig'
-filename = "%s/version/__init__.py" % NAME
+filename = "%s/version.py" % NAME
 with open(filename) as f:
     exec(f.read())
 
@@ -85,7 +85,7 @@ setup(
     # project is installed. For an analysis of "install_requires" vs pip's
     # requirements files see:
     # https://packaging.python.org/en/latest/technical.html#install-requires-vs-requirements-files
-    install_requires=['pandas', 'requests', 'requests-cache', 'six', 'bunch'], # bunch->lunch
+    install_requires=['pandas', 'requests', 'requests-cache', 'six', 'infi.bunch'], # bunch->lunch->infi.bunch
 
     # List additional groups of dependencies here (e.g. development dependencies).
     # You can install these using the following syntax, for example:
@@ -117,4 +117,3 @@ setup(
         ],
     },
 )
-
